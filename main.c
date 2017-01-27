@@ -94,7 +94,7 @@ sleep(10);
 A7_command_writeport("AT+GPS=1\r\n");
 printf("\nGPS ON");
 A7_command_writeport("AT+GPSRD=2\r\n");
-A7_gps_data_readport();
+//A7_gps_data_readport();
 
 }
 for(i= 0 ; i < strlen(string2) ;i++)

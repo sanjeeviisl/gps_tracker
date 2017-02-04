@@ -298,7 +298,9 @@ char ch;
 
 char string1[] = "$GPRMC,113821.000,V,,,,,,,270117,,,N*47\r";
 char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
+printf("\n Initializing GPS Module .....");
 Init_GPS_GSM_Module();
+printf("done");
 
 
 for(i= 0 ; i < strlen(string2) ;i++)

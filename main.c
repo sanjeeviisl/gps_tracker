@@ -306,7 +306,7 @@ printf("done");
 for(i= 0 ; i < strlen(string2) ;i++)
 {
 ch = string2[i];
-fuseDataGPS(ch);
+//fuseDataGPS(ch);
 }
 
 }

@@ -11,7 +11,7 @@
 #define FALSE 0
 #define TRUE 1
 
-int fd=0, n;
+int command_fd=0, n;
 
 struct termios SerialPortSettings;
 
@@ -20,8 +20,8 @@ void A7_command_readport(void)
   unsigned char buff;
 
   while (1) { 
-  n = read(fd, &buff, 1);
-   //	fcntl(fd,F_SETFL,0);
+  n = read(command_fd, &buff, 1);
+   //	fcntl(command_fd,F_SETFL,0);
   if (n == -1) switch(errno) {
          case EAGAIN: /* sleep() */ 
             continue;
@@ -40,7 +40,7 @@ void A7_command_writeport(unsigned char * buff)
   
   buff_len = strlen(buff);
 
-  n = write(fd, buff, buff_len);
+  n = write(command_fd, buff, buff_len);
 
                 if (n < 0)
                 {
@@ -56,21 +56,21 @@ void A7_command_writeport(unsigned char * buff)
 
 void A7_command_closeport(void)
 {
-	close(fd);
+	close(command_fd);
 }
 void A7_command_openport(void)
 {
-	 fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY );
+	 command_fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY );
 	 
-         if (fd < 0)
+         if (command_fd < 0)
          {
-			 printf("\A7 Command NOT port open :%d\n",fd);
+			 printf("\A7 Command NOT port open :%d\n",command_fd);
          	perror(MODEMDEVICE);
          }
 		 else
-			 printf("\A7 Command port open :%d\n",fd);
+			 printf("\A7 Command port open :%d\n",command_fd);
 
-		tcgetattr(fd, &SerialPortSettings);		 
+		tcgetattr(command_fd, &SerialPortSettings);		 
 
 		cfsetispeed(&SerialPortSettings,B9600);
         cfsetospeed(&SerialPortSettings,B9600);

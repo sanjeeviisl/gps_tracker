@@ -39,7 +39,7 @@ void A7_command_writeport(unsigned char * buff)
   
   buff_len = sizeof (buff);
 
-  n = write(fd, buff, buff_len + 1);
+  n = write(fd, buff, buff_len );
 
                 if (n < 0)
                 {
@@ -47,12 +47,16 @@ void A7_command_writeport(unsigned char * buff)
                 }
                 else
                 {
-                        printf("Image sent successfully %d\n");
+                        printf("Write successfully %d\n",n);
                 }
-                close(fd);
+                
   
 }
 
+void A7_command_closeport(void)
+{
+	close(fd);
+}
 void A7_command_openport(void)
 {
 	 fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY |O_NDELAY );

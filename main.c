@@ -65,6 +65,37 @@ struct gpsStruct gps;
 
 unsigned char   hour, extra_hour;
 
+int main()
+{
+int i;
+char ch;
+
+char string1[] = "$GPRMC,113821.000,V,,,,,,,270117,,,N*47\r";
+char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
+printf("\n Initializing GPS Module .....");
+Init_GPS_GSM_Module();
+
+printf("done");
+A7_command_openport();
+
+sleep(10);
+A7_command_writeport("AT+GPS=0\n\r");
+printf("GPS OFF");
+while(1)
+{
+sleep(10);
+A7_command_writeport("AT+GPS=1\n\r");
+printf("GPS ON");
+A7_command_writeport("AT+GPSRD=2\n\r");
+}
+for(i= 0 ; i < strlen(string2) ;i++)
+{
+ch = string2[i];
+//fuseDataGPS(ch);
+}
+
+}
+
 //unsigned int rx_buffer[RX_BUFFER_STRINGS][RX_BUFFER_SIZE];  // RX buffer
 //unsigned int tx_buffer[TX_BUFFER_SIZE];  // TX buffer
 //unsigned char rxStringNum = 0;
@@ -81,6 +112,7 @@ unsigned char   hour, extra_hour;
 
 int charToInt(char c){ return (c - 48);}
 double trunc(double d){ return (d>0) ? floor(d) : ceil(d) ; }
+
 
 void parseDataGPS(void){
 //    int received_cks = 16*digit2dec(gps.tmp_szChecksum[0]) + charToInt(gps.tmp_szChecksum[1]);
@@ -291,34 +323,4 @@ void gpsUartInit(void){
 
 
 
-int main()
-{
-int i;
-char ch;
-
-char string1[] = "$GPRMC,113821.000,V,,,,,,,270117,,,N*47\r";
-char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
-printf("\n Initializing GPS Module .....");
-Init_GPS_GSM_Module();
-
-printf("done");
-A7_command_openport();
-
-sleep(10);
-A7_command_writeport("AT+GPS=0\n\r");
-printf("GPS OFF");
-while(1)
-{
-sleep(10);
-A7_command_writeport("AT+GPS=1\n\r");
-printf("GPS ON");
-A7_command_writeport("AT+GPSRD=2\n\r");
-}
-for(i= 0 ; i < strlen(string2) ;i++)
-{
-ch = string2[i];
-//fuseDataGPS(ch);
-}
-
-}
 

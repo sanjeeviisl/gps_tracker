@@ -95,7 +95,7 @@ sleep(30);
 while(1)
  {
 sleep(1);
-printf("\nreading GPS DATA\n");
+//printf("\nreading GPS DATA\n");
 databyte =A7_gps_data_readport();
 if(databyte == 0)
 	{
@@ -184,7 +184,7 @@ void parseDataGPS(void){
         gps.UTCMin = charToInt(gps.words[1][2]) * 10 + charToInt(gps.words[1][3]);
         gps.UTCSec = charToInt(gps.words[1][4]) * 10 + charToInt(gps.words[1][5]);
 		
-		gps.UTCMin = gps.UTCMin+30;
+/*		gps.UTCMin = gps.UTCMin+30;
 		
 		if(gps.UTCMin > 60)
 		{
@@ -207,7 +207,7 @@ void parseDataGPS(void){
 			gps.UTCHour = gps.UTCHour;
 			extra_hour = 0;
 		}
-			
+*/			
         printf("\n Hour %d Minutes %d Seconds %d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
         // parse latitude and longitude in NMEA format
         gps.latitude = strtof(gps.words[2], NULL);

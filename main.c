@@ -70,31 +70,36 @@ int main()
 {
 int i;
 char ch;
+int databyte=0;
 
 char string1[] = "$GPRMC,113821.000,V,,,,,,,270117,,,N*47\r";
 char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
 printf("\n Initializing GPS Module .....");
 Init_GPS_GSM_Module();
-
 printf("done\n");
+
 A7_command_openport();
 A7_gps_data_openport();
 
+printf("\nGPS OFF");
 sleep(10);
 A7_command_writeport("AT+GPS=0\r\n");
-printf("\nGPS OFF");
 sleep(40);
-A7_command_writeport("AT+GPS=1\r\n");
 printf("\nGPS ON");
+A7_command_writeport("AT+GPS=1\r\n");
 A7_command_writeport("AT+GPSRD=2\r\n");
 
 while(1)
 {
 sleep(10);
+if(databyte == 0)
+{
 A7_command_writeport("AT+GPS=1\r\n");
-printf("\nGPS ON");
+printf("\ntrying to GPS ON");
 A7_command_writeport("AT+GPSRD=2\r\n");
-//A7_gps_data_readport();
+}
+printf("\nreading to GPS DATA");
+databyte =A7_gps_data_readport();
 
 }
 for(i= 0 ; i < strlen(string2) ;i++)

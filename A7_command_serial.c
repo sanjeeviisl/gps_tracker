@@ -37,9 +37,9 @@ void A7_command_writeport(unsigned char * buff)
 {
   int buff_len;
   
-  buff_len = sizeof (buff);
+  buff_len = strlen(buff);
 
-  n = write(fd, buff, 8 );
+  n = write(fd, buff, buff_len );
 
                 if (n < 0)
                 {
@@ -100,7 +100,7 @@ void A7_command_openport(void)
          newtp.c_cc[VEOL2]    = 0;     /* '\0' */
    	                                                                                                                                             
 //	  tcflush(fd, TCIFLUSH);
-//	 tcsetattr(fd,TCSANOW,&newtp);
+	 tcsetattr(fd,TCSANOW,&newtp);
 
      
 }

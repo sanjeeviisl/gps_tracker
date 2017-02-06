@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gps_init.h>
-#include<gps_init.h>
+#include <A7_command_serial.h>
 
 #define UART1_BAUD (9600)
 #define RX_BUFFER_SIZE 32     // RX buffer size
@@ -302,6 +302,7 @@ printf("\n Initializing GPS Module .....");
 Init_GPS_GSM_Module();
 printf("done");
 
+A7_command_openport();
 
 for(i= 0 ; i < strlen(string2) ;i++)
 {

@@ -305,14 +305,14 @@ printf("done");
 A7_command_openport();
 
 sleep(10);
-A7_command_writeport("AT+GPS=0");
+A7_command_writeport("AT+GPS=0\n\r");
 printf("GPS OFF");
 while(1)
 {
 sleep(10);
-A7_command_writeport("AT+GPS=1");
+A7_command_writeport("AT+GPS=1\n\r");
 printf("GPS ON");
-A7_command_writeport("AT+GPSRD=2");
+A7_command_writeport("AT+GPSRD=2\n\r");
 }
 for(i= 0 ; i < strlen(string2) ;i++)
 {

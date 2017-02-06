@@ -41,7 +41,7 @@ void A7_gps_data_closeport(void)
 
 void A7_gps_data_openport(void)
 {
-	 gps_data_fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY );
+	 gps_data_fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY| O_NDELAY | O_NONBLOCK );
 	 
          if (gps_data_fd < 0)
          {

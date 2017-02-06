@@ -82,24 +82,25 @@ A7_command_openport();
 A7_gps_data_openport();
 
 printf("\nGPS OFF");
-sleep(10);
+sleep(1);
 A7_command_writeport("AT+GPS=0\r\n");
-sleep(40);
+sleep(90);
 printf("\nGPS ON");
 A7_command_writeport("AT+GPS=1\r\n");
 A7_command_writeport("AT+GPSRD=2\r\n");
 
+sleep(30);
 while(1)
 {
-sleep(10);
+sleep(1);
+printf("\nreading GPS DATA\n");
+databyte =A7_gps_data_readport();
 if(databyte == 0)
 {
 A7_command_writeport("AT+GPS=1\r\n");
 printf("\ntrying to GPS ON");
 A7_command_writeport("AT+GPSRD=2\r\n");
 }
-printf("\nreading to GPS DATA");
-databyte =A7_gps_data_readport();
 
 }
 for(i= 0 ; i < strlen(string2) ;i++)

@@ -25,7 +25,7 @@ int A7_gps_data_readport(void)
                              
   bytes_read = read(gps_data_fd,&read_buffer,32);
   
-  printf("\nData Read %d : %s",bytes_read, read_buffer);
+  //printf("\nData Read %d : %s",bytes_read, read_buffer);
 
   if(bytes_read > 0)
       return bytes_read;

@@ -300,10 +300,19 @@ char string1[] = "$GPRMC,113821.000,V,,,,,,,270117,,,N*47\r";
 char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
 printf("\n Initializing GPS Module .....");
 Init_GPS_GSM_Module();
-printf("done");
 
+printf("done");
 A7_command_openport();
 
+while(1)
+{
+sleep(10);
+A7_command_writeport("AT+GPS=0\n");
+printf("GPS OFF");
+sleep(10);
+A7_command_writeport("AT+GPS=1\n");
+printf("GPS ON");
+}
 for(i= 0 ; i < strlen(string2) ;i++)
 {
 ch = string2[i];

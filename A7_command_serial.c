@@ -10,8 +10,6 @@
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
-void A7_command_openport(void);
-void A7_command_readport(void);
 
 int fd=0, n;
 struct termios oldtp, newtp;
@@ -32,6 +30,27 @@ void A7_command_readport(void)
   if (n ==0) break;
   printf("%d %c\n", n,buff);
   }
+}
+
+
+void A7_command_writeport(unsigned char * buff)
+{
+  int buff_len;
+  
+  buff_len = sizeof (buff);
+
+  n = write(fd, buff, buff_len + 1);
+
+                if (n < 0)
+                {
+                        printf("write() of bytes failed!\n");
+                }
+                else
+                {
+                        printf("Image sent successfully %d\n");
+                }
+                close(fd);
+  
 }
 
 void A7_command_openport(void)

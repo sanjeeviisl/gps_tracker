@@ -71,6 +71,7 @@ int main()
 int i;
 char ch;
 int databyte=0;
+char  * data_buffer; 
 
 char string1[] = "$GPRMC,113821.000,V,,,,,,,270117,,,N*47\r";
 char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
@@ -87,28 +88,33 @@ A7_command_writeport("AT+GPS=0\r\n");
 sleep(90);
 printf("\nGPS ON");
 A7_command_writeport("AT+GPS=1\r\n");
+A7_command_writeport("AT+AGPS=1\r\n");
 A7_command_writeport("AT+GPSRD=2\r\n");
 
 sleep(30);
 while(1)
-{
+ {
 sleep(1);
 printf("\nreading GPS DATA\n");
 databyte =A7_gps_data_readport();
 if(databyte == 0)
-{
-A7_command_writeport("AT+GPS=1\r\n");
-printf("\ntrying to GPS ON");
-A7_command_writeport("AT+GPSRD=2\r\n");
-}
+	{
+	A7_command_writeport("AT+GPS=1\r\n");
+	A7_command_writeport("AT+AGPS=1\r\n");
+	printf("\ntrying to GPS ON");
+	A7_command_writeport("AT+GPSRD=2\r\n");
+	}
 
-}
-for(i= 0 ; i < strlen(string2) ;i++)
-{
-ch = string2[i];
-//fuseDataGPS(ch);
-}
+else{
+     data_buffer = A7_gps_data_buffer();
+	for(i= 0 ; i < databyte ;i++)
+		{
+		ch = data_buffer[i];
+		fuseDataGPS(ch);
+		}
+    }
 
+ }
 }
 
 //unsigned int rx_buffer[RX_BUFFER_STRINGS][RX_BUFFER_SIZE];  // RX buffer

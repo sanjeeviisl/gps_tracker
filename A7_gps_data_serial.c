@@ -16,10 +16,11 @@
 int gps_data_fd=0, n;
 
 struct termios SerialPortSettings;
+  char read_buffer[256];     
 
 int A7_gps_data_readport(void)
 {
-  char read_buffer[132];                
+           
   int  bytes_read = 0;                 
                              
   bytes_read = read(gps_data_fd,&read_buffer,32);
@@ -32,6 +33,11 @@ int A7_gps_data_readport(void)
      return 0; 
 }
 
+
+char * A7_gps_data_buffer()
+{
+	return read_buffer;
+}
 
 void A7_gps_data_closeport(void)
 {

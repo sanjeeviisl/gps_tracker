@@ -54,7 +54,7 @@ void A7_gps_data_openport(void)
                                                               
 		/* Setting Time outs */                                       
 		SerialPortSettings.c_cc[VMIN]  = 32; /* Read 10 characters */  
-		SerialPortSettings.c_cc[VTIME] = 0;  /* Wait indefinitely   */ 
+		SerialPortSettings.c_cc[VTIME] = 10;  /* Wait indefinitely   */ 
 		
 		tcsetattr(gps_data_fd,TCSANOW,&SerialPortSettings);   
 

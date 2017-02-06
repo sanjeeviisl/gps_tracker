@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <gps_init.h>
 #include <A7_command_serial.h>
+#include <A7_gps_data_serial.h>
 
 #define UART1_BAUD (9600)
 #define RX_BUFFER_SIZE 32     // RX buffer size
@@ -75,18 +76,26 @@ char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
 printf("\n Initializing GPS Module .....");
 Init_GPS_GSM_Module();
 
-printf("done");
+printf("done\n");
 A7_command_openport();
+A7_gps_data_openport();
 
 sleep(10);
-A7_command_writeport("AT+GPS=0\n\r");
-printf("GPS OFF");
+A7_command_writeport("AT+GPS=0\r\n");
+printf("\nGPS OFF");
+sleep(40);
+A7_command_writeport("AT+GPS=1\r\n");
+printf("\nGPS ON");
+A7_command_writeport("AT+GPSRD=2\r\n");
+
 while(1)
 {
 sleep(10);
-A7_command_writeport("AT+GPS=1\n\r");
-printf("GPS ON");
-A7_command_writeport("AT+GPSRD=2\n\r");
+A7_command_writeport("AT+GPS=1\r\n");
+printf("\nGPS ON");
+A7_command_writeport("AT+GPSRD=2\r\n");
+A7_gps_data_readport();
+
 }
 for(i= 0 ; i < strlen(string2) ;i++)
 {

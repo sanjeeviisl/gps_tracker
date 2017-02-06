@@ -307,10 +307,10 @@ A7_command_openport();
 while(1)
 {
 sleep(10);
-A7_command_writeport("AT+GPS=0\n");
+A7_command_writeport("AT+GPS=0");
 printf("GPS OFF");
 sleep(10);
-A7_command_writeport("AT+GPS=1\n");
+A7_command_writeport("AT+GPS=1");
 printf("GPS ON");
 }
 for(i= 0 ; i < strlen(string2) ;i++)

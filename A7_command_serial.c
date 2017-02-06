@@ -39,7 +39,7 @@ void A7_command_writeport(unsigned char * buff)
   
   buff_len = sizeof (buff);
 
-  n = write(fd, buff, buff_len );
+  n = write(fd, buff, 8 );
 
                 if (n < 0)
                 {

@@ -24,7 +24,7 @@ int  bytes_read = 0;
   bytes_read = read(command_fd,&read_buffer,1024);
   
   read_buffer[bytes_read] = '\0';
-  //printf("\nData Read %d : %s",bytes_read, read_buffer);
+  printf("\nA7_command Response Read %d : %s",bytes_read, read_buffer);
 
   if(bytes_read > 0)
       return read_buffer;
@@ -68,7 +68,7 @@ void A7_command_writeport(unsigned char * buff)
      }
    else
      {
-     //printf("Write successfully %d\n",n);
+     printf("Write %s successfully %d\n",buff, n);
      }
                 
 }
@@ -79,7 +79,7 @@ void A7_command_closeport(void)
 }
 void A7_command_openport(void)
 {
-	 command_fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY );
+	 command_fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY |  O_NDELAY | O_NONBLOCK );
 	 
          if (command_fd < 0)
          {
@@ -89,7 +89,17 @@ void A7_command_openport(void)
 		 else
 			 printf("\A7 Command port open :%d\n",command_fd);
 
-		 A7_command_baudrate(B9600);
+		tcgetattr(command_fd, &SerialPortSettings);		 
+		
+		SerialPortSettings.c_cflag |= CREAD | CLOCAL;//enable receiver
+                                                              
+		/* Setting Time outs */                                       
+		SerialPortSettings.c_cc[VMIN]  = 32; /* Read 10 characters */  
+		SerialPortSettings.c_cc[VTIME] = 10;  /* Wait indefinitely   */ 
+		
+		tcsetattr(command_fd,TCSANOW,&SerialPortSettings);   
+		 
+		// A7_command_baudrate(B9600);
      
 }
 

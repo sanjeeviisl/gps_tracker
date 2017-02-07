@@ -27,6 +27,7 @@ Init_GPS_GSM_Module();
 
 printf("\nstarting gps module ...");
 
+A7_Show_GSM_Siganl_Qauality();
 sleep(10);
 A7_command_writeport("AT+GPS=0\r\n");
 A7_command_writeport("AT+GPS=1\r\n");

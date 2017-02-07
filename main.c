@@ -25,8 +25,9 @@ A7_command_openport();
 A7_gps_data_openport();
 
 printf("\nGPS OFF");
-sleep(1);
+sleep(10);
 A7_command_writeport("AT+GPS=0\r\n");
+A7_command_writeport("AT+GPS=1\r\n");
 sleep(90);
 printf("\nGPS ON");
 A7_command_writeport("AT+GPS=1\r\n");

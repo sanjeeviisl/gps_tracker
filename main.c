@@ -23,16 +23,15 @@ A7_gps_data_openport();
 
 HARD_RESET :
 printf("\n Initializing GPS Module .....");
-
 Init_GPS_GSM_Module();
-printf("done\n");
 
-printf("\nGPS OFF");
+printf("\nstarting gps module ...");
+
 sleep(10);
 A7_command_writeport("AT+GPS=0\r\n");
 A7_command_writeport("AT+GPS=1\r\n");
 sleep(60);
-printf("\nGPS ON");
+printf("\nGPS ON\n");
 A7_command_writeport("AT+GPS=1\r\n");
 A7_command_writeport("AT+AGPS=1\r\n");
 A7_command_writeport("AT+GPSRD=2\r\n");

@@ -45,7 +45,7 @@ http://gitlab.koukei.de/Tobias/A7HTTPLibrary.git
 	short  A7HTTP_A7waitFor(char * response1, char * response2, int timeOut);
 		
 	
-A7HTTP_A7HTTP(char * APN, char * host, char * path, int port, char * Content_Type)
+void A7HTTP_post_setup(char * APN, char * host, char * path, int port, char * Content_Type)
 {
  OK = 1;
  NOTOK = 2;
@@ -177,6 +177,8 @@ short  A7HTTP_A7waitFor(char * response1, char * response2, int timeOut) {
 short  A7HTTP_A7command(const char * command, const char * response1, const  char * response2, int timeOut, int repetitions) {
   short returnValue = NOTOK;
   short count = 0;
+  A7board_println(command);
+/*  
   while (count < repetitions && returnValue != OK) {
     A7board_println(command);
     printf(command);
@@ -187,6 +189,7 @@ short  A7HTTP_A7command(const char * command, const char * response1, const  cha
     //printf("NOTOK" + count);
     count++;
   }
+  */
   return returnValue;
 }
 

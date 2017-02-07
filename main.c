@@ -10,14 +10,16 @@
 
 int main()
 {
-int i;
+int i, count =0 ;
 char ch;
 int databyte=0;
 char  * data_buffer; 
 
 char string1[] = "$GPRMC,113821.000,V,,,,,,,270117,,,N*47\r";
 char string2[] ="$GPGGA,113822.000,,,,,0,00,,,M,,M,,0000*73\r";
+HARD_RESET :
 printf("\n Initializing GPS Module .....");
+
 Init_GPS_GSM_Module();
 printf("done\n");
 
@@ -46,6 +48,9 @@ if(databyte == 0)
 	A7_command_writeport("AT+AGPS=1\r\n");
 	printf("\ntrying to GPS ON");
 	A7_command_writeport("AT+GPSRD=2\r\n");
+	count++;
+	if ( count > 7)
+		goto HARD_RESET;
 	}
 
 else{

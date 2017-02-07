@@ -14,10 +14,28 @@
 int command_fd=0, n;
 
 struct termios SerialPortSettings;
+unsigned char read_buffer[1024];     
+unsigned char read_string[1024];     
 
-void A7_command_readport(void)
+unsigned char * A7_command_readport(void)
 {
-  unsigned char buff;
+int  bytes_read = 0;                 
+                             
+  bytes_read = read(command_fd,&read_buffer,1024);
+  
+  read_buffer[bytes_read] = '\0';
+  //printf("\nData Read %d : %s",bytes_read, read_buffer);
+
+  if(bytes_read > 0)
+      return read_buffer;
+  else
+     return NULL; 
+}
+
+unsigned char * A7_command_read_string(void)
+{
+unsigned char buff;
+int i = 0;
 
   while (1) { 
   n = read(command_fd, &buff, 1);
@@ -28,11 +46,13 @@ void A7_command_readport(void)
           
          default: break;
          }
+  if(buff == ' ') break;
+  read_string[i++] = buff;
   if (n ==0) break;
-  printf("%d %c\n", n,buff);
   }
+  
+  return   read_string;
 }
-
 
 void A7_command_writeport(unsigned char * buff)
 {
@@ -42,16 +62,15 @@ void A7_command_writeport(unsigned char * buff)
 
   n = write(command_fd, buff, buff_len);
 
-                if (n < 0)
-                {
-                        printf("write() of bytes failed!\n");
-                }
-                else
-                {
-                        //printf("Write successfully %d\n",n);
-                }
+  if (n < 0)
+     {
+      printf("write() of bytes failed!\n");
+     }
+   else
+     {
+     //printf("Write successfully %d\n",n);
+     }
                 
-  
 }
 
 void A7_command_closeport(void)
@@ -70,10 +89,15 @@ void A7_command_openport(void)
 		 else
 			 printf("\A7 Command port open :%d\n",command_fd);
 
+		 A7_command_baudrate(B9600);
+     
+}
+
+void A7_command_baudrate(char * baud_rate)
+{
 		tcgetattr(command_fd, &SerialPortSettings);		 
 
 		cfsetispeed(&SerialPortSettings,B9600);
         cfsetospeed(&SerialPortSettings,B9600);
-     
-}
 
+}

@@ -78,6 +78,18 @@ Init_GPS_GSM_Module();
 printf("Setup done");
 }
 
+int A7_Show_GSM_Siganl_Qauality()
+{
+  printf("Start A7_Show_GSM_Siganl_Qauality function");
+ 
+  A7HTTP_A7command("AT+CGATT?", "OK", "yy", 20000, 2);
+  A7HTTP_A7command("AT+CGATT=1", "OK", "yy", 20000, 2);
+  A7board_println("AT+CSQ"); //Signal Quality
+  sleep(1);
+  A7HTTP_ShowSerialData();
+  sleep(1);
+}
+
 int A7HTTP_HttpPost(char * body)
 {
   int bodyLength ;

@@ -68,7 +68,7 @@ void A7_command_writeport(unsigned char * buff)
      }
    else
      {
-     printf("Write %s successfully %d\n",buff, n);
+    // printf("Write %s successfully %d\n",buff, n);
      }
                 
 }

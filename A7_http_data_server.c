@@ -214,7 +214,9 @@ int  A7HTTP_A7begin() {
 
 void  A7HTTP_ShowSerialData()
 {
-    printf(A7_command_readport());
+    printf(A7_command_read_string());
+	printf(A7_command_read_string());
+	printf(A7_command_read_string());
 }
 
 char * A7HTTP_A7read() {

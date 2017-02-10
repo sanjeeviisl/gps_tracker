@@ -1,7 +1,6 @@
 
 #include "rs232.h"
 
-
 int Cport[38],  error;
 
 struct termios new_port_settings,   old_port_settings[38];
@@ -17,8 +16,7 @@ char comports[38][16]={"/dev/ttyS0","/dev/ttyS1","/dev/ttyS2","/dev/ttyS3","/dev
 
 int RS232_OpenComport(int comport_number, int baudrate, const char *mode)
 {
-  int baudr,
-      status;
+  int baudr, status;
 
   if((comport_number>37)||(comport_number<0))
   {
@@ -28,26 +26,6 @@ int RS232_OpenComport(int comport_number, int baudrate, const char *mode)
 
   switch(baudrate)
   {
-    case      50 : baudr = B50;
-                   break;
-    case      75 : baudr = B75;
-                   break;
-    case     110 : baudr = B110;
-                   break;
-    case     134 : baudr = B134;
-                   break;
-    case     150 : baudr = B150;
-                   break;
-    case     200 : baudr = B200;
-                   break;
-    case     300 : baudr = B300;
-                   break;
-    case     600 : baudr = B600;
-                   break;
-    case    1200 : baudr = B1200;
-                   break;
-    case    1800 : baudr = B1800;
-                   break;
     case    2400 : baudr = B2400;
                    break;
     case    4800 : baudr = B4800;
@@ -75,18 +53,6 @@ int RS232_OpenComport(int comport_number, int baudrate, const char *mode)
     case 1000000 : baudr = B1000000;
                    break;
     case 1152000 : baudr = B1152000;
-                   break;
-    case 1500000 : baudr = B1500000;
-                   break;
-    case 2000000 : baudr = B2000000;
-                   break;
-    case 2500000 : baudr = B2500000;
-                   break;
-    case 3000000 : baudr = B3000000;
-                   break;
-    case 3500000 : baudr = B3500000;
-                   break;
-    case 4000000 : baudr = B4000000;
                    break;
     default      : printf("invalid baudrate\n");
                    return(1);
@@ -148,12 +114,6 @@ int RS232_OpenComport(int comport_number, int baudrate, const char *mode)
               return(1);
               break;
   }
-
-/*
-http://pubs.opengroup.org/onlinepubs/7908799/xsh/termios.h.html
-
-http://man7.org/linux/man-pages/man3/termios.3.html
-*/
 
   Cport[comport_number] = open(comports[comport_number], O_RDWR | O_NOCTTY | O_NDELAY);
   if(Cport[comport_number]==-1)
@@ -224,7 +184,6 @@ int RS232_SendByte(int comport_number, unsigned char byte)
   printf("%c",byte);
   n = write(Cport[comport_number], &byte, 1);
   if(n<0)  return(1);
-
   return(0);
 }
 
@@ -370,8 +329,6 @@ void RS232_disableRTS(int comport_number)
     perror("unable to set portstatus");
   }
 }
-
-
 
 
 void RS232_cputs(int comport_number, const char *text)  /* sends a string to serial port */

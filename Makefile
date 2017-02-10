@@ -6,8 +6,8 @@
 #
 
 # define the C compiler to use
-#CC = gcc
-CC = arm-linux-gnueabihf-gcc
+CC = gcc
+#CC = arm-linux-gnueabihf-gcc
 
 # define any compile-time flags
 CFLAGS = -Wall -g -w
@@ -27,7 +27,8 @@ LFLAGS = -L/home/newhall/lib  -L../lib
 LIBS = -lm
 
 # define the C source files
-SRCS = main.c gpio_lib.c gps_init.c gps_lib.c A7_command_serial.c A7_gps_data_serial.c A7_http_data_server.c
+SRCS = main.c gpio_lib.c gps_init.c gps_lib.c A7_command_serial.c A7_gps_data_serial.c A7_http_data_server.c \
+       rs232.c sim808.c http_post.c
 
 # define the C object files 
 #

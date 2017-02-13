@@ -41,7 +41,7 @@ SRCS = main.c gpio_lib.c gps_init.c gps_lib.c A7_command_serial.c A7_gps_data_se
 OBJS = $(SRCS:.c=.o)
 
 # define the executable file 
-MAIN = vehicle_tracker
+MAIN = vehicle_tracker.out
 
 #
 # The following part of the makefile is generic; it can be used to 

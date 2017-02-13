@@ -10,6 +10,7 @@
 
 int SIM808_main()
 {
+sim808_gps_test();
 }
 
 

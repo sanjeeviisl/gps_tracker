@@ -420,7 +420,7 @@ restart:
         goto exit;
 
 printf("%s",http_string0);
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, http_string0);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -431,7 +431,7 @@ printf("%s",http_string0);
 
 printf("%s",http_string1);
 
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, http_string1);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -441,7 +441,7 @@ printf("%s",http_string1);
 
 printf("%s",http_string2);
 
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, http_string2);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -455,7 +455,7 @@ snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s", http_h
 
 printf("%s",send_string);
 
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, send_string);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -466,7 +466,7 @@ printf("%s",send_string);
 
 printf("%s",http_string4);
 
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, http_string4);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -476,7 +476,7 @@ printf("%s",http_string4);
 
 printf("%s",http_string5);
 
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, http_string5);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -486,7 +486,7 @@ printf("%s",http_string5);
 
 printf("%s",http_string6);
 
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, http_string6);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -497,7 +497,7 @@ printf("%s",http_string6);
 sleep(6);
 printf("%s",http_string7);
 
-    RS232_cputs(cport_nr, http_string);
+    RS232_cputs(cport_nr, http_string7);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -507,9 +507,129 @@ printf("%s",http_string7);
 
 
 
-SUCCESS: printf("SUCCESS");
+SUCCESS: printf("\n SEND DATA SUCCESS");
 return(1);
-exit: printf("FAILED");
+exit: printf("\n SEND DATA FAILED");
+return(0);
+
+}
+
+int getSim808DeviceInfo() {
+
+char device_string1[]= "AT\r\n";
+char device_string2[]= "AT+CGMM\r\n";
+char device_string3[]= "AT+CGMI\r\n";
+
+restart:
+
+printf("%s",device_string1);
+
+    RS232_cputs(cport_nr, device_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",device_string2);
+
+    RS232_cputs(cport_nr, device_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",device_string3);
+
+    RS232_cputs(cport_nr, device_string3);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+SUCCESS: printf("\nDEVICE INFO SUCCESS");
+return(1);
+exit: printf("\nDEVICE INFO FAILED");
+return(0);
+
+	
+}
+
+int Sim808DataConnect() {
+	
+	
+char data_connect_string1[]= "AT+CREG?\r\n";
+char data_connect_string2[]= "AT+CGACT?\r\n";
+char data_connect_string3[]= "AT+CMEE=1\r\n";
+char data_connect_string4[]= "AT+CGATT=1\r\n";
+char data_connect_string5[]= "AT+CGACT=1,1\r\n";
+char data_connect_string6[]= "AT+CGPADDR=1\r\n";
+
+restart:
+
+printf("%s",data_connect_string1);
+
+    RS232_cputs(cport_nr, data_connect_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",data_connect_string2);
+
+    RS232_cputs(cport_nr, data_connect_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",data_connect_string3);
+
+    RS232_cputs(cport_nr, data_connect_string3);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",data_connect_string4);
+
+    RS232_cputs(cport_nr, data_connect_string4);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",data_connect_string5);
+
+    RS232_cputs(cport_nr, data_connect_string5);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",data_connect_string6);
+
+    RS232_cputs(cport_nr, data_connect_string6);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+SUCCESS: printf("\nDATA CONNECT SUCCESS");
+return(1);
+exit: printf("DATA CONNECT FAILED");
 return(0);
 
 }
@@ -519,14 +639,11 @@ return(0);
 int sim808_gps_test()
 {
 
-
-char mode[]={'8','N','1',0},str[512];
-
-
 int i;
 size_t size;
 char ch;
 char *string;
+char mode[]={'8','N','1',0},str[512];
 
 if(RS232_OpenComport(cport_nr, bdrate, mode))
   {
@@ -534,39 +651,27 @@ if(RS232_OpenComport(cport_nr, bdrate, mode))
     return(0);
   }
 
-restart:
-    RS232_cputs(cport_nr, "AT\r\n");
+getSim808DeviceInfo();
 
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
-
-    // You can send individual bytes to the serial/COM port using this function
-    //RS232_SendByte(cport_nr,0x1A); // 0x1A is a hex equivalent of Ctrl^Z key press
-
-
-
-string = read_file("gpslog.txt",&size);
-if( string != NULL)
-for(i= 0 ; i < size ;i++)
-  {
-  ch = string[i];
-  parseGPSNIMEADATA(ch);
-  if(count>1)
-    {
-     printf("\nsending data to web server \n");
-     sendDataToServer();
-     count =0;
-     sleep(1);
-    }  
-  }
-
-
-
-SUCCESS: printf("SUCCESS");
-return(0);
+if(Sim808DataConnect())
+{
+	string = read_file("gpslog.txt",&size);
+	if( string != NULL)
+	for(i= 0 ; i < size ;i++)
+	  {
+	  ch = string[i];
+	  parseGPSNIMEADATA(ch);
+	  if(count>1)
+		{
+		 printf("\nsending data to web server \n");
+		 sendDataToServer();
+		 count =0;
+		 sleep(1);
+		}  
+	  }
+	SUCCESS: printf("SUCCESS");
+	return(0);
+}
 exit: printf("FAILED");
 }
 

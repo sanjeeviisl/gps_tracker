@@ -9,14 +9,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-/*
-#define UART1_BAUD (9600)
-#define RX_BUFFER_SIZE 32     // RX buffer size
-#define TX_BUFFER_SIZE 32     // TX buffer size
-#define RX_BUFFER_SIZE 32     // RX buffer size
-#define RX_BUFFER_STRINGS 1
-#define TX_BUFFER_SIZE 32     // TX buffer size
-*/
+#include "rs232.h"
 
 #define true 1
 #define false 0
@@ -83,7 +76,13 @@ char * http_header_str;
 char * latitude_str;
 char * longitude_str;
 char device_id_str[10];
-char updated_time_str[10];
+char updated_time_str[6];
+
+int cport_nr=1,    /* /dev/ttyS0 */
+    bdrate=115200; /* 115200 baud */
+const unsigned char OKToken[]={"OK"};
+unsigned char buf[6000];
+int buf_SIZE=sizeof(buf);
 
 char *dtostrf (double val, signed char width, unsigned char prec, char *sout) { 
    char fmt[20]; 
@@ -91,6 +90,89 @@ char *dtostrf (double val, signed char width, unsigned char prec, char *sout) {
    sprintf(sout, fmt, val); 
    return sout; 
 } 
+
+/*******************************************************************************
+* Funtion name : MapForward                                                    *
+*                                                                              *
+* Description  : This function performs forward mapping and returns pointer    *
+*                to the start of the found data or else returns NULL pointer   *
+*                                                                              *
+* Arguments    : 1) Poshorter to the data in which mapping is to be made       *
+*                2) Length of the data in which mapping is to be made          *
+*                3) Poshorter to the data points to be mapped                  *
+*                4) Length of the data points to be mapped                     *
+*                                                                              *
+* Returns      : Pointer in which result is returned                           *
+*******************************************************************************/
+static unsigned char * MapForwardReturn
+(
+        unsigned char *pMapData,
+        unsigned short   MapDataLength,
+        unsigned char *pMapPoints,
+        unsigned short   MapPointsLength
+)
+{
+    unsigned short DataIndex;
+    unsigned short MapPointIndex;
+
+    for(DataIndex = 0; DataIndex < MapDataLength - MapPointsLength + 1; DataIndex++)
+    {
+
+        for(MapPointIndex = 0; MapPointIndex < MapPointsLength; MapPointIndex++)
+        {
+            if( pMapData[DataIndex + MapPointIndex] != pMapPoints[MapPointIndex])
+            {   
+                goto PICK_NEXT_FMAPDATA;
+            }
+        }
+
+        return(& pMapData[DataIndex]);
+        
+    PICK_NEXT_FMAPDATA:;
+
+    }
+    return(NULL);
+}
+
+static int ReadComport(int cport_nr,unsigned char *buf,int size,useconds_t count) //size=6000
+{
+        int n;
+        n=0;
+        usleep(count);
+  while(1)
+  {
+
+    n = RS232_PollComport(cport_nr, buf, size);
+
+    if(n > 0)
+    {
+      buf[n] = 0;   /* always put a "null" at the end of a string! */
+
+      //for(i=0; i < n; i++)
+      //{
+        //if(buf[i] < 32)  /* replace unreadable control-codes by dots */
+        //{
+        //  buf[i] = '.';
+        //}
+      //}
+
+      printf("%s\n", (char *)buf);
+      break;
+    }
+}
+
+        return n;
+}
+
+static void Resetbufer(unsigned char *buf,int size)
+{
+        int i;
+        for(i=0;i<size;i++)
+        {
+                buf[i] = '0';
+        }
+}
+
 
 
 void parseDataSIM808GPS(void){
@@ -161,7 +243,7 @@ void parseDataSIM808GPS(void){
         latitude_str=dtostrf(gps.latitude,0,6,t_buffer2);
 
 
-	strcpy(updated_time_str,gps.words[1]);
+	strncpy(updated_time_str,gps.words[1],6);
         // parse number of satellites
         gps.satellitesUsed = (int)strtof(gps.words[7], NULL);
         
@@ -314,59 +396,121 @@ char* read_file (const char* filename, size_t* length)
 
 int sendDataToServer()
 {
-//Check the registration status
 char http_string[]= "AT+CREG?\r\n";
-
-//Check whether bearer 1 is open.
 char http_string0[]= "AT+SAPBR=2,1\r\n";
-
-//Enable bearer 1
 char http_string1[]= "AT+SAPBR=1,1\r\n";
-
-//Wait untial bearer is activated
-//WAIT=6
-
-//Initialize HTTP service
 char http_string2[]= "AT+HTTPINIT\r\n";
-//WAIT=1
-//Set the HTTP URL
 char http_string3[]= "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/device_details/add_devices_updated.php?device_id=123456789\"";
 char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/device_details/add_devices_updated.php?";
-
-//Set the context ID
 char http_string4[]= "AT+HTTPPARA=\"CID\",1\r\n";
-
-//Set up the HTTP action
 char http_string5[]= "AT+HTTPACTION=0\r\n";
-
-//Do a HTTP read
 char http_string6[]= "AT+HTTPREAD\r\n";
-
-//Wait for the HTTP response
-//WAIT=6
-
-//Terminate the HTTP service
-
 char http_string7[]= "AT+HTTPTERM\r\n";
 
 
 strcpy(device_id_str,"1234567890");
 
 printf("%s",http_string);
+restart:
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
 printf("%s",http_string0);
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+
 printf("%s",http_string1);
+
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
 printf("%s",http_string2);
+
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
 sleep(1);
 snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s", http_header_str,"device_id=",device_id_str,"&" \
           "latitude=",latitude_str,"&" , "longitude=",longitude_str,"&","updated_time=",updated_time_str,"\"\r\n");
 
 printf("%s",send_string);
 
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+
 printf("%s",http_string4);
+
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
 printf("%s",http_string5);
+
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
 printf("%s",http_string6);
+
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
 sleep(6);
 printf("%s",http_string7);
+
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+
+
+SUCCESS: printf("SUCCESS");
+return(1);
+exit: printf("FAILED");
+return(0);
 
 }
 
@@ -374,24 +518,55 @@ printf("%s",http_string7);
 
 int sim808_gps_test()
 {
+
+
+char mode[]={'8','N','1',0},str[512];
+
+
 int i;
 size_t size;
 char ch;
 char *string;
+
+if(RS232_OpenComport(cport_nr, bdrate, mode))
+  {
+    printf("Can not open comport\n");
+    return(0);
+  }
+
+restart:
+    RS232_cputs(cport_nr, "AT\r\n");
+
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+    // You can send individual bytes to the serial/COM port using this function
+    //RS232_SendByte(cport_nr,0x1A); // 0x1A is a hex equivalent of Ctrl^Z key press
+
+
+
 string = read_file("gpslog.txt",&size);
 if( string != NULL)
 for(i= 0 ; i < size ;i++)
   {
   ch = string[i];
   parseGPSNIMEADATA(ch);
-  if(count>10)
+  if(count>1)
     {
      printf("\nsending data to web server \n");
      sendDataToServer();
      count =0;
-     sleep(10);
+     sleep(1);
     }  
   }
 
+
+
+SUCCESS: printf("SUCCESS");
+return(0);
+exit: printf("FAILED");
 }
 

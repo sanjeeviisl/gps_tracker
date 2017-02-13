@@ -54,14 +54,20 @@ int i = 0;
   return   read_string;
 }
 
-void A7_command_writeport(unsigned char * buff)
+int A7_command_writeportln(unsigned char * buff)
+{
+  int buff_len;
+  buff_len = A7_command_writeport(buff);
+  A7_command_writeport("\n");
+  return buff_len+1;
+}
+
+int A7_command_writeport(unsigned char * buff)
 {
   int buff_len;
   
   buff_len = strlen(buff);
-
   n = write(command_fd, buff, buff_len);
-
   if (n < 0)
      {
       printf("write() of bytes failed!\n");
@@ -70,8 +76,9 @@ void A7_command_writeport(unsigned char * buff)
      {
     // printf("Write %s successfully %d\n",buff, n);
      }
-                
+   return n;	                 
 }
+
 
 void A7_command_closeport(void)
 {

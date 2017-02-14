@@ -78,7 +78,11 @@ int SIM808_main()
     int i = 0;
     int err,res;
 
-    openSIM808Port();
+    if(!openSIM808Port())
+	{
+         printf("\n Comport is not initialized\n");
+         return 0;
+	}
 
     if(!getSim808DeviceInfo())
 	{

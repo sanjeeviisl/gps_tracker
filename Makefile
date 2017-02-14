@@ -28,7 +28,7 @@ LIBS = -lm -lpthread
 
 # define the C source files
 SRCS = main.c gpio_lib.c gps_init.c gps_lib.c A7_command_serial.c A7_gps_data_serial.c A7_http_data_server.c \
-       rs232.c sim808.c http_post.c sim808_lib.c sim808_gps.c SIM808_main.c A7_main.c sim808_data.c
+       rs232.c sim808.c http_post.c sim808_lib.c sim808_gps.c SIM808_main.c A7_main.c A7_lib.c sim808_data.c
 
 # define the C object files 
 #

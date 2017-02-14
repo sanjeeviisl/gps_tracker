@@ -18,6 +18,9 @@
 #include <string.h>
 #include <errno.h>        
 #include <stdlib.h> 
+
+#include "sim808_lib.h"
+
 #define BAUDRATE B115200 
 
 #include "rs232.h"
@@ -33,6 +36,13 @@ int fd=0,port_number, n;
 
 int receiveGPSData() {
 unsigned char buff;
+
+if(!GPSSim808Power(1))
+	return 0;
+sleep(10);
+if(!GPSSim808NIMEAData(1))
+	return 0;
+
 
 file = fopen( "gpslog1.txt", "w+" );
 port_number = 1;
@@ -51,8 +61,12 @@ while (1) {
 
 quit:
    fclose (file);
-   
+   GPSSim808NIMEAData(0);
+   sleep(1); 
+   GPSSim808Power(0);
+   return 1;
 
+   
 }
 
 

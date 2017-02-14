@@ -104,6 +104,159 @@ if(RS232_OpenComport(cport_nr, bdrate, mode))
 	}
 	
 }
+int getSim808DeviceInfo() {
+
+char device_string1[]= "AT\r\n";
+char device_string2[]= "AT+CGMM\r\n";
+char device_string3[]= "AT+CGMI\r\n";
+
+restart:
+
+printf("%s",device_string1);
+
+    RS232_cputs(cport_nr, device_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",device_string2);
+
+    RS232_cputs(cport_nr, device_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",device_string3);
+
+    RS232_cputs(cport_nr, device_string3);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+SUCCESS: printf("\nDEVICE INFO SUCCESS");
+return(1);
+exit: printf("\nDEVICE INFO FAILED");
+return(0);
+
+	
+}
+
+
+int GPSSim808Power(int ON) {
+
+
+char gps_power_string1[]= "AT+POWER=1\r\n";
+char gps_power_string2[]= "AT+POWER=0\r\n";
+char gps_power_string3[]= "AT\r\n";
+
+
+if(ON)
+{
+printf("%s",gps_power_string1);
+
+    RS232_cputs(cport_nr, gps_power_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+	sleep(10);
+}
+else
+{
+
+printf("%s",gps_power_string2);
+
+    RS232_cputs(cport_nr, gps_power_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+}
+
+
+printf("%s",gps_power_string3);
+
+    RS232_cputs(cport_nr, gps_power_string3);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+SUCCESS: printf("\nGPS POWER SUCCESS");
+return(1);
+exit: printf("\nGPS POWER FAILED");
+return(0);
+
+	
+}
+
+
+
+int GPSSim808NIMEAData(int ON) {
+
+
+char nimea_data_string1[]= "??1\r\n"; //NIMEA DATA ON
+char nimea_data_string2[]= "??\r\n";  //NIMEA DATA OFF
+char nimea_data_string3[]= "??\r\n";  //NIMEA DATA STATUS
+
+
+if(ON)
+{
+printf("%s",nimea_data_string1);
+
+    RS232_cputs(cport_nr, nimea_data_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+	sleep(10);
+}
+else
+{
+
+printf("%s",nimea_data_string2);
+
+    RS232_cputs(cport_nr, nimea_data_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+}
+
+
+printf("%s",nimea_data_string3);
+
+    RS232_cputs(cport_nr, nimea_data_string3);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+SUCCESS: printf("\nNIMEA DATA SUCCESS");
+return(1);
+exit: printf("\nNIMEA DATA FAILED");
+return(0);
+
+	
+}
+
+
 
 
 int sendDataToServer()
@@ -228,51 +381,6 @@ return(1);
 exit: printf("\n SEND DATA FAILED");
 return(0);
 
-}
-
-int getSim808DeviceInfo() {
-
-char device_string1[]= "AT\r\n";
-char device_string2[]= "AT+CGMM\r\n";
-char device_string3[]= "AT+CGMI\r\n";
-
-restart:
-
-printf("%s",device_string1);
-
-    RS232_cputs(cport_nr, device_string1);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
-
-
-printf("%s",device_string2);
-
-    RS232_cputs(cport_nr, device_string2);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
-
-printf("%s",device_string3);
-
-    RS232_cputs(cport_nr, device_string3);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
-
-
-SUCCESS: printf("\nDEVICE INFO SUCCESS");
-return(1);
-exit: printf("\nDEVICE INFO FAILED");
-return(0);
-
-	
 }
 
 int Sim808DataConnect() {

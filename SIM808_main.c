@@ -6,6 +6,7 @@
 #include <gps_init.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include "sim808_lib.h"
 
 pthread_t tid[2];
 pthread_mutex_t lock;
@@ -30,8 +31,13 @@ void* gpsDataReceiverTask(void *arg)
     if(pthread_equal(id,tid[0]))
     {
         printf("\n Receiver  thread processing\n");
-                sleep(5);
-    receiveGPSData();
+
+         if(!receiveGPSData())
+		 	{
+		 	printf("\n Receive Data Not OK");
+			       sleep(50000);
+         	}
+	         
     }
 
     pthread_mutex_unlock(&lock);
@@ -70,9 +76,17 @@ void* gpsDataSenderTask(void *arg)
 int SIM808_main()
 {
     int i = 0;
-    int err;
+    int err,res;
 
-    int res = sem_init(&done_filling_list,  /* pointer to semaphore */
+    openSIM808Port();
+
+    if(!getSim808DeviceInfo())
+	{
+         printf("Device is not initialized\n");
+         return 0;
+	}
+
+    res = sem_init(&done_filling_list,  /* pointer to semaphore */
                        0 ,                  /* 0 if shared between threads, 1 if shared between processes */
                        0);                  /* initial value for semaphore (0 is locked) */
     if (res < 0)

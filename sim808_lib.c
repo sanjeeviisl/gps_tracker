@@ -102,6 +102,7 @@ if(RS232_OpenComport(cport_nr, bdrate, mode))
     printf("Can not open comport\n");
     return(0);
 	}
+    return(1);
 	
 }
 int getSim808DeviceInfo() {

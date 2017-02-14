@@ -78,7 +78,7 @@ static int ReadComport(int cport_nr,unsigned char *buf,int size,useconds_t count
     if(n > 0)
     {
       buf[n] = 0;   /* always put a "null" at the end of a string! */
-      printf("%s\n", (char *)buf);
+      //printf("%s\n", (char *)buf);
       break;
     }
    }
@@ -112,7 +112,7 @@ char device_string3[]= "AT+CGMI\r\n";
 
 restart:
 
-printf("%s",device_string1);
+//printf("%s",device_string1);
 
     RS232_cputs(cport_nr, device_string1);
     Resetbufer(buf,sizeof(buf));
@@ -122,7 +122,7 @@ printf("%s",device_string1);
         goto exit;
 
 
-printf("%s",device_string2);
+//printf("%s",device_string2);
 
     RS232_cputs(cport_nr, device_string2);
     Resetbufer(buf,sizeof(buf));
@@ -131,7 +131,7 @@ printf("%s",device_string2);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-printf("%s",device_string3);
+//printf("%s",device_string3);
 
     RS232_cputs(cport_nr, device_string3);
     Resetbufer(buf,sizeof(buf));
@@ -141,7 +141,7 @@ printf("%s",device_string3);
         goto exit;
 
 
-SUCCESS: printf("\nDEVICE INFO SUCCESS");
+SUCCESS: printf("\nDEVICE INFO SUCCESS\n");
 return(1);
 exit: printf("\nDEVICE INFO FAILED");
 return(0);
@@ -161,7 +161,7 @@ char gps_power_string4[]= "AT+CGPSINF=0\r\n";
 
 if(ON)
 {
-printf("%s",gps_power_string1);
+//printf("%s",gps_power_string1);
 
     RS232_cputs(cport_nr, gps_power_string1);
     Resetbufer(buf,sizeof(buf));
@@ -169,12 +169,12 @@ printf("%s",gps_power_string1);
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
-	sleep(10);
+	sleep(30);
 }
 else
 {
 
-printf("%s",gps_power_string2);
+//printf("%s",gps_power_string2);
 
     RS232_cputs(cport_nr, gps_power_string2);
     Resetbufer(buf,sizeof(buf));
@@ -186,7 +186,7 @@ printf("%s",gps_power_string2);
 
 
 
-printf("%s",gps_power_string3);
+//printf("%s",gps_power_string3);
 
     RS232_cputs(cport_nr, gps_power_string3);
     Resetbufer(buf,sizeof(buf));
@@ -195,7 +195,7 @@ printf("%s",gps_power_string3);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-printf("%s",gps_power_string4);
+//printf("%s",gps_power_string4);
 
     RS232_cputs(cport_nr, gps_power_string4);
     Resetbufer(buf,sizeof(buf));
@@ -204,7 +204,7 @@ printf("%s",gps_power_string4);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-SUCCESS: printf("\nGPS POWER SUCCESS");
+SUCCESS: printf("\nGPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED");
 return(0);
@@ -224,7 +224,7 @@ char nimea_data_string3[]= "AT+CGPSPWR=0\r\n";  //NIMEA DATA STATUS
 
 if(ON)
 {
-printf("%s",nimea_data_string1);
+//printf("%s",nimea_data_string1);
 
     RS232_cputs(cport_nr, nimea_data_string1);
     Resetbufer(buf,sizeof(buf));
@@ -237,7 +237,7 @@ printf("%s",nimea_data_string1);
 else
 {
 
-printf("%s",nimea_data_string2);
+//printf("%s",nimea_data_string2);
 
     RS232_cputs(cport_nr, nimea_data_string2);
     Resetbufer(buf,sizeof(buf));
@@ -247,7 +247,7 @@ printf("%s",nimea_data_string2);
         goto exit;
 
 
-printf("%s",nimea_data_string3);
+//printf("%s",nimea_data_string3);
 
     RS232_cputs(cport_nr, nimea_data_string3);
     Resetbufer(buf,sizeof(buf));
@@ -258,7 +258,7 @@ printf("%s",nimea_data_string3);
 
 }
 
-SUCCESS: printf("\nNIMEA DATA SUCCESS");
+SUCCESS: printf("\nNIMEA DATA SUCCESS\n");
 return(1);
 exit: printf("\nNIMEA DATA FAILED");
 return(0);

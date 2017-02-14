@@ -51,9 +51,9 @@ while (true) {
          }
   if (n ==0) break;
   fputc(buff, file);
-  printf("%c.", buff);
+  printf("%c", buff);
   count++;
-  if(count > 1024 *1024) break;
+  if(count > 1024 *1024 * 1024) break;
   }
 
 quit:

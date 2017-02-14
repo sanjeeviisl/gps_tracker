@@ -2,172 +2,351 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <gps_init.h>
-#include <A7_command_serial.h>
-#include <A7_gps_data_serial.h>
-#include <A7_http_data_server.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "sim808_lib.h"
+#include "rs232.h"
+#define true 1
+#define false 0
+
+extern char * latitude_str;
+extern char * longitude_str;
+extern char updated_time_str[6];
+
+int cport_nr=1,    /* /dev/ttyS0 */
+    bdrate=115200; /* 115200 baud */
+char mode[]={'8','N','1',0},str[512];
 
 
-//SendTextMessage()
-///this function is to send a sms message
-void SendTextMessage()
+
+char device_id_str[10];
+
+const unsigned char OKToken[]={"OK"};
+unsigned char buf[6000];
+int buf_SIZE=sizeof(buf);
+
+
+/*******************************************************************************
+* Funtion name : MapForward                                                    *
+*                                                                              *
+* Description  : This function performs forward mapping and returns pointer    *
+*                to the start of the found data or else returns NULL pointer   *
+*                                                                              *
+* Arguments    : 1) Poshorter to the data in which mapping is to be made       *
+*                2) Length of the data in which mapping is to be made          *
+*                3) Poshorter to the data points to be mapped                  *
+*                4) Length of the data points to be mapped                     *
+*                                                                              *
+* Returns      : Pointer in which result is returned                           *
+*******************************************************************************/
+static unsigned char * MapForwardReturn
+(
+        unsigned char *pMapData,
+        unsigned short   MapDataLength,
+        unsigned char *pMapPoints,
+        unsigned short   MapPointsLength
+)
 {
-A7_command_writeport("AT+CMGF=1\r");    //Because we want to send the SMS in text mode
-sleep(1);
-A7_command_writeportln("AT + CMGS = \"+86138xxxxx615\"");//send sms message, be careful need to add a country code before the cellphone number
-sleep(1);
-A7_command_writeportln("A test message!");//the content of the message
-sleep(1);
-A7_command_writeportln((char)26);//the ASCII code of the ctrl+z is 26
-sleep(1);
-A7_command_writeportln("AT");
+    unsigned short DataIndex;
+    unsigned short MapPointIndex;
+    for(DataIndex = 0; DataIndex < MapDataLength - MapPointsLength + 1; DataIndex++)
+    {
+        for(MapPointIndex = 0; MapPointIndex < MapPointsLength; MapPointIndex++)
+        {
+            if( pMapData[DataIndex + MapPointIndex] != pMapPoints[MapPointIndex])
+            {   
+                goto PICK_NEXT_FMAPDATA;
+            }
+        }
+        return(& pMapData[DataIndex]);
+    PICK_NEXT_FMAPDATA:;
+    }
+    return(NULL);
 }
 
-///DialVoiceCall
-///this function is to dial a voice call
-void DialVoiceCall()
+static int ReadComport(int cport_nr,unsigned char *buf,int size,useconds_t count) //size=6000
 {
-A7_command_writeportln("ATD + +86138xxxxx615;");//dial the number
-sleep(1);
-A7_command_writeportln("AT");
+  int n=0;
+  usleep(count);
+  while(1)
+  {
+    n = RS232_PollComport(cport_nr, buf, size);
+    if(n > 0)
+    {
+      buf[n] = 0;   /* always put a "null" at the end of a string! */
+      printf("%s\n", (char *)buf);
+      break;
+    }
+   }
+  return n;
 }
 
-///SubmitHttpRequest()
-///this function is submit a http request
-///attention:the time of sleep is very important, it must be set enough 
-void SubmitHttpRequest()
+static void Resetbufer(unsigned char *buf,int size)
 {
-A7_command_writeportln("AT+CSQ");
-sleep(1);
-
-ShowSerialData();// this code is to show the data from gprs shield, in order to easily see the process of how the gprs shield submit a http request, and the following is for this purpose too.
-
-A7_command_writeportln("AT+CGATT?");
-sleep(1);
-
-ShowSerialData();
-
-A7_command_writeportln("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"");//setting the SAPBR, the connection type is using gprs
-sleep(1);
-
-ShowSerialData();
-
-A7_command_writeportln("AT+SAPBR=3,1,\"APN\",\"CMNET\"");//setting the APN, the second need you fill in your local apn server
-sleep(4);
-
-ShowSerialData();
-
-A7_command_writeportln("AT+SAPBR=1,1");//setting the SAPBR, for detail you can refer to the AT command mamual
-sleep(2);
-
-ShowSerialData();
-
-A7_command_writeportln("AT+HTTPINIT"); //init the HTTP request
-
-sleep(2); 
-ShowSerialData();
-
-A7_command_writeportln("AT+HTTPPARA=\"URL\",\"www.google.com.hk\"");// setting the httppara, the second parameter is the website you want to access
-sleep(1);
-
-ShowSerialData();
-
-A7_command_writeportln("AT+HTTPACTION=0");//submit the request 
-sleep(10);//the sleep is very important, the sleep time is base on the return from the website, if the return datas are very large, the time required longer.
-//while(!mySerial.available());
-
-ShowSerialData();
-
-A7_command_writeportln("AT+HTTPREAD");// read the data from the website you access
-sleep(1);
-
-ShowSerialData();
-
-A7_command_writeportln("AT");
-sleep(1);
+        int i;
+        for(i=0;i<size;i++)
+        {
+                buf[i] = '0';
+        }
 }
 
-///send2Pachube()///
-///this function is to send the sensor data to the pachube, you can see the new value in the pachube after execute this function///
-void Send2Pachube()
+
+int openSIM808Port() {
+
+if(RS232_OpenComport(cport_nr, bdrate, mode))
+	{
+    printf("Can not open comport\n");
+    return(0);
+	}
+	
+}
+
+
+int sendDataToServer()
 {
+	
 
-char * humidity = "1031";//these 4 line code are imitate the real sensor data, because the demo did't add other sensor, so using 4 string variable to replace.
-char * moisture = "1242";//you can replace these four variable to the real sensor data in your project
-char * temperature = "30";//
-char * barometer = "60.56";//
+char send_string[ 1024 ];
 
-A7_command_writeportln("AT+CGATT?");
-sleep(1);
+char http_string[]= "AT+CREG?\r\n";
+char http_string0[]= "AT+SAPBR=2,1\r\n";
+char http_string1[]= "AT+SAPBR=1,1\r\n";
+char http_string2[]= "AT+HTTPINIT\r\n";
+char http_string3[]= "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/device_details/add_devices_updated.php?device_id=123456789\"";
+char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/device_details/add_devices_updated.php?";
+char http_string4[]= "AT+HTTPPARA=\"CID\",1\r\n";
+char http_string5[]= "AT+HTTPACTION=0\r\n";
+char http_string6[]= "AT+HTTPREAD\r\n";
+char http_string7[]= "AT+HTTPTERM\r\n";
 
-ShowSerialData();
 
-A7_command_writeportln("AT+CSTT=\"CMNET\"");//start task and setting the APN,
-sleep(1);
+strcpy(device_id_str,"1234567890");
 
-ShowSerialData();
+printf("%s",http_string);
+restart:
+    RS232_cputs(cport_nr, http_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
 
-A7_command_writeportln("AT+CIICR");//bring up wireless connection
-sleep(1);
+printf("%s",http_string0);
+    RS232_cputs(cport_nr, http_string0);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
 
-ShowSerialData();
 
-A7_command_writeportln("AT+CIFSR");//get local IP adress
-sleep(2);
 
-ShowSerialData();
+printf("%s",http_string1);
 
-A7_command_writeportln("AT+CIPSPRT=0");
-sleep(3);
+    RS232_cputs(cport_nr, http_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
 
-ShowSerialData();
 
-A7_command_writeportln("AT+CIPSTART=\"tcp\",\"www.iisl.co.in\",\"8081\"");//start up the connection
-sleep(2);
+printf("%s",http_string2);
 
-ShowSerialData();
+    RS232_cputs(cport_nr, http_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
 
-A7_command_writeportln("AT+CIPSEND");//begin send data to remote server
-sleep(4);
-ShowSerialData();
-sleep(1);
-ShowSerialData();
-A7_command_writeportln(" \"version\": \"1.0.0\",\"datastreams\": ");
-sleep(1);
-ShowSerialData();
-A7_command_writeportln("[\"id\": \"01\",\"current_value\": \"" );
-A7_command_writeportln(barometer);
-A7_command_writeportln("\",");
-sleep(1);
-ShowSerialData();
-A7_command_writeportln("\"id\": \"02\",\"current_value\": \"" );
-A7_command_writeportln(humidity );
-A7_command_writeportln( "\",");
-sleep(1);
-ShowSerialData();
-A7_command_writeportln("\"id\": \"03\",\"current_value\": \"" );
-A7_command_writeportln(moisture );
-A7_command_writeportln("\",");
-sleep(1);
-ShowSerialData();
-A7_command_writeportln("\"id\": \"04\",\"current_value\": \"" );
-A7_command_writeportln(temperature );
-A7_command_writeportln("\"],\"token\": \"lee\"");
 
 sleep(1);
-ShowSerialData();
+snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s", http_header_str,"device_id=",device_id_str,"&" \
+          "latitude=",latitude_str,"&" , "longitude=",longitude_str,"&","updated_time=",updated_time_str,"\"\r\n");
 
-A7_command_writeportln((char)26);//sending
-sleep(1);//waitting for reply, important! the time is base on the condition of internet 
-A7_command_writeportln("AT");
+printf("%s",send_string);
 
-ShowSerialData();
+    RS232_cputs(cport_nr, send_string);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
 
-A7_command_writeportln("AT+CIPCLOSE");//close the connection
-sleep(1);
-ShowSerialData();
+
+
+printf("%s",http_string4);
+
+    RS232_cputs(cport_nr, http_string4);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",http_string5);
+
+    RS232_cputs(cport_nr, http_string5);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",http_string6);
+
+    RS232_cputs(cport_nr, http_string6);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+sleep(6);
+printf("%s",http_string7);
+
+    RS232_cputs(cport_nr, http_string7);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+
+
+SUCCESS: printf("\n SEND DATA SUCCESS");
+return(1);
+exit: printf("\n SEND DATA FAILED");
+return(0);
 
 }
-void ShowSerialData()
-{
+
+int getSim808DeviceInfo() {
+
+char device_string1[]= "AT\r\n";
+char device_string2[]= "AT+CGMM\r\n";
+char device_string3[]= "AT+CGMI\r\n";
+
+restart:
+
+printf("%s",device_string1);
+
+    RS232_cputs(cport_nr, device_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",device_string2);
+
+    RS232_cputs(cport_nr, device_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",device_string3);
+
+    RS232_cputs(cport_nr, device_string3);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+SUCCESS: printf("\nDEVICE INFO SUCCESS");
+return(1);
+exit: printf("\nDEVICE INFO FAILED");
+return(0);
+
+	
 }
+
+int Sim808DataConnect() {
+	
+	
+char data_connect_string1[]= "AT+CREG?\r\n";
+char data_connect_string2[]= "AT+CGACT?\r\n";
+char data_connect_string3[]= "AT+CMEE=1\r\n";
+char data_connect_string4[]= "AT+CGATT=1\r\n";
+char data_connect_string5[]= "AT+CGACT=1,1\r\n";
+char data_connect_string6[]= "AT+CGPADDR=1\r\n";
+
+restart:
+
+printf("%s",data_connect_string1);
+
+    RS232_cputs(cport_nr, data_connect_string1);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",data_connect_string2);
+
+    RS232_cputs(cport_nr, data_connect_string2);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",data_connect_string3);
+
+    RS232_cputs(cport_nr, data_connect_string3);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",data_connect_string4);
+
+    RS232_cputs(cport_nr, data_connect_string4);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+
+printf("%s",data_connect_string5);
+
+    RS232_cputs(cport_nr, data_connect_string5);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+printf("%s",data_connect_string6);
+
+    RS232_cputs(cport_nr, data_connect_string6);
+    Resetbufer(buf,sizeof(buf));
+    ReadComport(cport_nr,buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+        goto exit;
+
+SUCCESS: printf("\nDATA CONNECT SUCCESS");
+return(1);
+exit: printf("DATA CONNECT FAILED");
+return(0);
+
+}
+

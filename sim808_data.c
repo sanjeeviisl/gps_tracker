@@ -45,7 +45,7 @@ file = fopen( "gpslog1.txt", "w+" );
 while (true) { 
   n = RS232_PollComport(cport_nr,&buff,1 );
   if (n == -1) switch(errno) {
-         case EAGAIN: /* sleep() */ 
+         case EAGAIN:  sleep(1) ;
             continue;
          default: goto quit;
          }

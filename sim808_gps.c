@@ -1,4 +1,5 @@
 
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -10,7 +11,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "rs232.h"
-
 #define true 1
 #define false 0
 
@@ -21,6 +21,7 @@ void gpsUartInit(void);
 void parseDataSIM808GPS(void);
 void fuseDataGPS(char c);
 int charToInt(char c);
+int sendGPSData() ;
 double trunc(double d);
 typedef int bool ;
 int count =0;
@@ -636,6 +637,8 @@ return(0);
 
 
 
+
+
 int sim808_gps_test()
 {
 
@@ -673,5 +676,33 @@ if(Sim808DataConnect())
 	return(0);
 }
 exit: printf("FAILED");
+}
+
+
+
+
+int sendGPSData() {
+int i; 
+size_t size;
+char ch;
+char *string;
+
+if(Sim808DataConnect())
+     {
+        string = read_file("gpslog.txt",&size);
+        if( string != NULL) 
+        for(i= 0 ; i < size ;i++)
+          {
+          ch = string[i];
+          parseGPSNIMEADATA(ch);
+          if(count>1)
+                {
+                 printf("\nsending data to web server \n");
+                 sendDataToServer();
+                 count =0;
+                }
+          }
+     }
+
 }
 

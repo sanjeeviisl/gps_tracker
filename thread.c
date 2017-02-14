@@ -1,20 +1,19 @@
-
-#include <math.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <gps_init.h>
+#include<stdio.h>
+#include<string.h>
+#include<pthread.h>
+#include<stdlib.h>
+#include<unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
-
+ 
 pthread_t tid[2];
 pthread_mutex_t lock;
 sem_t done_filling_list;        /* barrier to sync fill_list threads and empty_list threads */
 sem_t filling_list;             /* to protect threads_fill_done */
 
 
-extern int sendGPSData() ;
-extern int receiveGPSData() ;
+extern int sendGPSData() ; 
+extern int receiveGPSData() ; 
 void* gpsDataReceiverTask(void *arg)
 {
     unsigned long i = 0;
@@ -22,15 +21,15 @@ void* gpsDataReceiverTask(void *arg)
 
     while(1)
     {
-                
-        /* entering critical section with semaphore (could use mutex too) */
+		
+	/* entering critical section with semaphore (could use mutex too) */
     sem_wait(&filling_list); // blocks is semaphore 0. If semaphore nonzero,
                              // it decrements semaphore and proceeds
-    pthread_mutex_lock(&lock);  
+    pthread_mutex_lock(&lock);    
     if(pthread_equal(id,tid[0]))
     {
         printf("\n Receiver  thread processing\n");
-                sleep(5);
+		sleep(5);
     receiveGPSData();
     }
 
@@ -49,25 +48,31 @@ void* gpsDataSenderTask(void *arg)
 
     while(1)
     {
-
-        sem_wait(&done_filling_list);
-        
-    pthread_mutex_lock(&lock);  
+    
+	sem_wait(&done_filling_list);
+	
+    pthread_mutex_lock(&lock);    
     if(pthread_equal(id,tid[1]))
     {
-                printf("\n Sender  thread processing\n");
+		printf("\n Sender  thread processing\n");
                 sendGPSData();
-                sleep(13);
+		sleep(13);
     }
-        
+	
     pthread_mutex_unlock(&lock);
-        sem_post(&filling_list);
-     
+	sem_post(&filling_list);
+	
     }
 
+    return NULL;
 }
 
-int SIM808_main()
+
+
+
+
+
+int main(void)
 {
     int i = 0;
     int err;
@@ -107,9 +112,5 @@ int SIM808_main()
     while(1)
         sleep(500000);
     return 0;
-
 }
-
-
-
 

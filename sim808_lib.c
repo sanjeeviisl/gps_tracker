@@ -14,6 +14,8 @@
 #define false 0
 
 int gpsPowerON = false;
+int httpInitialize = false;
+
 
 extern char * latitude_str;
 extern char * longitude_str;
@@ -290,41 +292,44 @@ strcpy(device_id_str,"1234567890");
 
 //printf("%s",http_string);
 restart:
-    RS232_cputs(cport_nr, http_string);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
 
-//printf("%s",http_string0);
-    RS232_cputs(cport_nr, http_string0);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
+	if(!httpInitialize) {
+	    RS232_cputs(cport_nr, http_string);
+	    Resetbufer(buf,sizeof(buf));
+	    ReadComport(cport_nr,buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+	        goto exit;
 
-
-
-//printf("%s",http_string1);
-
-    RS232_cputs(cport_nr, http_string1);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
+	//printf("%s",http_string0);
+	    RS232_cputs(cport_nr, http_string0);
+	    Resetbufer(buf,sizeof(buf));
+	    ReadComport(cport_nr,buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+	        goto exit;
 
 
-//printf("%s",http_string2);
 
-    RS232_cputs(cport_nr, http_string2);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
+	//printf("%s",http_string1);
+
+	    RS232_cputs(cport_nr, http_string1);
+	    Resetbufer(buf,sizeof(buf));
+	    ReadComport(cport_nr,buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+	        goto exit;
+		httpInitialize = true;
+		}
+
+	//printf("%s",http_string2);
+
+	    RS232_cputs(cport_nr, http_string2);
+	    Resetbufer(buf,sizeof(buf));
+	    ReadComport(cport_nr,buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+	        goto exit;
 
 
 sleep(1);

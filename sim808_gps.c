@@ -29,6 +29,11 @@ int count =0;
 char * latitude_str;
 char * longitude_str;
 char updated_time_str[6];
+char updated_date_str[8];
+char newFileName[26];
+extern char * logFileName;
+
+
 
 struct gpsStruct {//GPRMC
     int     timeZone;
@@ -207,10 +212,13 @@ void parseDataSIM808GPS(void){
         gps.speed *= 1.15078; // convert to mph
         // parse bearing
         gps.bearing = strtof(gps.words[8], NULL);
+
+		strncpy(updated_date_str,gps.words[1],8);
         // parse UTC date
         gps.UTCDay = charToInt(gps.words[9][0]) * 10 + charToInt(gps.words[9][1]);
         gps.UTCMonth = charToInt(gps.words[9][2]) * 10 + charToInt(gps.words[9][3]);
         gps.UTCYear = charToInt(gps.words[9][4]) * 10 + charToInt(gps.words[9][5]);
+		
         printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
         printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);
         sleep(1); 
@@ -352,7 +360,7 @@ char ch;
 char *string;
 if(Sim808DataConnect())
      {
-        string = read_file("gpslog1.txt",&size);
+        string = read_file(logFileName,&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
@@ -367,6 +375,12 @@ if(Sim808DataConnect())
           }
 		release_file(string);
 		string = NULL;
+		
+		strcpy(newFileName,updated_time_str);
+ 	    strcat(newFileName,updated_date_str);
+		strcat(newFileName,logFileName);
+		
+		system("mv logFileName newFileName");
      }
 else
 	{

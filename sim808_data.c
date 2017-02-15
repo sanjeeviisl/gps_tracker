@@ -27,7 +27,7 @@
 int receiveGPSData() ;
 
 FILE *file;
-
+char logFileName[]="_gpslog.txt";
 
 int receiveGPSData() {
 unsigned char buff;
@@ -46,7 +46,7 @@ if(!GPSSim808NIMEAData(1))
 		return 0;
 	}
 
-file = fopen( "gpslog1.txt", "w+" );
+file = fopen( "", "w+" );
 
 while (true) { 
   n = RS232_PollComport(cport_nr,&buff,1 );

@@ -1,7 +1,9 @@
-#ifndef rs232_INCLUDED
-#define rs232_INCLUDED
+#ifndef LIB808_INCLUDED
+#define LIB808_INCLUDED
 
 extern int cport_nr;
+
+
 extern int openSIM808Port() ;
 extern int sendDataToServer();
 

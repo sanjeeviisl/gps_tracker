@@ -412,7 +412,7 @@ restart:
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
-
+	sleep(2);
 
 //printf("%s",data_connect_string2);
 
@@ -422,6 +422,7 @@ restart:
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
+	sleep(3);
 
 //printf("%s",data_connect_string3);
 
@@ -440,6 +441,7 @@ restart:
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
+	sleep(10);
 
 
 //printf("%s",data_connect_string5);
@@ -450,6 +452,7 @@ restart:
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
+	sleep(5);
 
 //printf("%s",data_connect_string6);
 

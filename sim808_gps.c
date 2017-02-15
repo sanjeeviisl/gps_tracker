@@ -360,7 +360,7 @@ char ch;
 char *string;
 if(Sim808DataConnect())
      {
-        string = read_file(logFileName,&size);
+        string = read_file(gpslog.txt,&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
@@ -373,8 +373,8 @@ if(Sim808DataConnect())
                  count =0;
                 }
           }
-		release_file(string);
-		string = NULL;
+		//release_file(string);
+		//string = NULL;
 		
 		strcpy(newFileName,updated_time_str);
  	    strcat(newFileName,updated_date_str);

@@ -6,6 +6,9 @@
 #include <gps_init.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <unistd.h>
 #include "sim808_lib.h"
 
 pthread_t tid[2];
@@ -137,12 +140,12 @@ int SIM808_main()
 		
         printf("Canceling thread\n");
         s = pthread_cancel(tid[0]);
-        if (s != 0)
-            handle_error_en(s, "gpsDataSenderTask pthread_cancel");
+//        if (s != 0)
+//            handle_error_en(s, "gpsDataSenderTask pthread_cancel");
 
         s = pthread_cancel(tid[1]);
-        if (s != 0)
-            handle_error_en(s, "gpsDataReceiverTask pthread_cancel");
+//        if (s != 0)
+//            handle_error_en(s, "gpsDataReceiverTask pthread_cancel");
 
 		sleep(60);
         system("reboot");

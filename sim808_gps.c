@@ -370,7 +370,7 @@ if(Sim808DataConnect())
      }
 else
 	{
-	printf("\n GPSRS Data is not connected !!!\");
+	printf("\n GPSRS Data is not connected !!!");
 	return(0);
 	}
 return(1);

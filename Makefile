@@ -6,8 +6,8 @@
 #
 
 # define the C compiler to use
-#CC = gcc
-CC = arm-linux-gnueabihf-gcc
+CC = gcc
+#CC = arm-linux-gnueabihf-gcc
 
 # define any compile-time flags
 CFLAGS = -Wall -g -w

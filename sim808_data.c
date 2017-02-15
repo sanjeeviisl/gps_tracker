@@ -35,10 +35,16 @@ int count = 0 ;
 int  n = 0;
 
 if(!GPSSim808Power(1))
+{
+	printf("\n GPS is power ON failed !!!");
 	return 0;
-sleep(10);
+}
+//sleep(10);
 if(!GPSSim808NIMEAData(1))
-	return 0;
+	{
+		printf("\n GPS is NIMEA DATA failed !!!");
+		return 0;
+	}
 
 file = fopen( "gpslog1.txt", "w+" );
 
@@ -49,18 +55,21 @@ while (true) {
             continue;
          default: goto quit;
          }
-  if (n ==0) break;
+  if (n == 0) {sleep(1); continue;}
+  
   fputc(buff, file);
   printf("%c", buff);
-  count++;
-  if(count > 1024 *1024 * 1024) break;
+  
+  if(buff == '$') count++;
+  
+  if(count > 60) break;
   }
 
 quit:
    fclose (file);
    GPSSim808NIMEAData(0);
-   sleep(1); 
-   GPSSim808Power(0);
+   //sleep(1); 
+   //GPSSim808Power(0); // not required because it need again
    return n;
 
    

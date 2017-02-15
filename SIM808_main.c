@@ -16,6 +16,7 @@ sem_t filling_list;             /* to protect threads_fill_done */
 
 extern int sendGPSData() ;
 extern int receiveGPSData() ;
+
 void* gpsDataReceiverTask(void *arg)
 {
     unsigned long i = 0;
@@ -41,7 +42,7 @@ void* gpsDataReceiverTask(void *arg)
     }
 
     pthread_mutex_unlock(&lock);
-   sem_post(&done_filling_list);
+    sem_post(&done_filling_list);
 
     }
 
@@ -56,18 +57,22 @@ void* gpsDataSenderTask(void *arg)
     while(1)
     {
 
-        sem_wait(&done_filling_list);
-        
+    sem_wait(&done_filling_list);    
     pthread_mutex_lock(&lock);  
+	
     if(pthread_equal(id,tid[1]))
     {
-                printf("\n Sender  thread processing\n");
-                sendGPSData();
-                sleep(13);
+      printf("\n Sender  thread processing\n");
+      if(!sendGPSData())
+		   {
+		   printf("\n Send Data Not OK");
+ 		   sleep(500);
+  	   		}
+
     }
         
     pthread_mutex_unlock(&lock);
-        sem_post(&filling_list);
+    sem_post(&filling_list);
      
     }
 
@@ -75,7 +80,7 @@ void* gpsDataSenderTask(void *arg)
 
 int SIM808_main()
 {
-    int i = 0;
+    int i,s = 0;
     int err,res;
 
     if(!openSIM808Port())
@@ -113,17 +118,35 @@ int SIM808_main()
     err = pthread_create(&(tid[0]), NULL, &gpsDataReceiverTask, NULL);
     if (err != 0)
        printf("\ncan't create thread :[%s]", strerror(err));
-    else
-       printf("\n Receiver Thread created successfully\n");
+//    else
+//       printf("\n Receiver Thread created successfully\n");
 
     err = pthread_create(&(tid[1]), NULL, &gpsDataSenderTask, NULL);
+
     if (err != 0)
        printf("\ncan't create thread :[%s]", strerror(err));
-    else
-       printf("\n Sender Thread created successfully\n");
+//    else
+//       printf("\n Sender Thread created successfully\n");
 
     while(1)
-        sleep(500000);
+    	{
+        sleep(86400);  //sleep for 24 hours (24*60*60)
+
+        sem_wait(&filling_list);
+	    sem_wait(&done_filling_list);
+		
+        printf("Canceling thread\n");
+        s = pthread_cancel(tid[0]);
+        if (s != 0)
+            handle_error_en(s, "gpsDataSenderTask pthread_cancel");
+
+        s = pthread_cancel(tid[1]);
+        if (s != 0)
+            handle_error_en(s, "gpsDataReceiverTask pthread_cancel");
+
+		sleep(60);
+        system("reboot");
+    	}
     return 0;
 
 }

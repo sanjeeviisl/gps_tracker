@@ -151,7 +151,7 @@ void parseDataSIM808GPS(void){
         latitude_str=dtostrf(gps.latitude,0,6,t_buffer2);
 
 
-	strncpy(updated_time_str,gps.words[1],6);
+		strncpy(updated_time_str,gps.words[1],6);
         // parse number of satellites
         gps.satellitesUsed = (int)strtof(gps.words[7], NULL);
         
@@ -164,7 +164,7 @@ void parseDataSIM808GPS(void){
         printf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
         printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
         count++;
-        sleep(1); 
+       // sleep(1); 
         // data ready
         gps.flagDataReady = true;
     }//$GPGGA
@@ -303,6 +303,13 @@ char* read_file (const char* filename, size_t* length)
 }
 
 
+void release_file (char* buffer)
+{
+
+free(buffer);
+
+}
+
 
 
 int sim808_gps_test()
@@ -345,7 +352,7 @@ char ch;
 char *string;
 if(Sim808DataConnect())
      {
-        string = read_file("gpslog.txt",&size);
+        string = read_file("gpslog1.txt",&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
@@ -358,7 +365,15 @@ if(Sim808DataConnect())
                  count =0;
                 }
           }
+		release_file(string);
+		string = NULL;
      }
+else
+	{
+	printf("\n GPSRS Data is not connected !!!\");
+	return(0);
+	}
+return(1);
 
 }
 

@@ -13,6 +13,8 @@
 #define true 1
 #define false 0
 
+int gpsPowerON = false;
+
 extern char * latitude_str;
 extern char * longitude_str;
 extern char updated_time_str[6];
@@ -78,7 +80,7 @@ static int ReadComport(int cport_nr,unsigned char *buf,int size,useconds_t count
     if(n > 0)
     {
       buf[n] = 0;   /* always put a "null" at the end of a string! */
-      //printf("%s\n", (char *)buf);
+      printf("%s\n", (char *)buf);
       break;
     }
    }
@@ -164,13 +166,18 @@ if(ON)
 {
 //printf("%s",gps_power_string1);
 
-    RS232_cputs(cport_nr, gps_power_string1);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
-	sleep(40);
+	if(!gpsPowerON){
+	    RS232_cputs(cport_nr, gps_power_string1);
+	    Resetbufer(buf,sizeof(buf));
+	    ReadComport(cport_nr,buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+	        goto exit;
+		sleep(40);
+		gpsPowerON = true;
+
+		}
+
 
 //printf("%s",gps_power_string3);
 
@@ -190,12 +197,14 @@ if(ON)
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
+	gpsPowerON = true;
+
 }
 else
 {
 
 //printf("%s",gps_power_string2);
-
+	gpsPowerON = false;
     RS232_cputs(cport_nr, gps_power_string2);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -207,7 +216,7 @@ else
 
 SUCCESS: printf("\nGPS POWER SUCCESS\n");
 return(1);
-exit: printf("\nGPS POWER FAILED");
+exit: printf("\nGPS POWER FAILED\n");
 return(0);
 
 	
@@ -220,8 +229,6 @@ int GPSSim808NIMEAData(int ON) {
 
 char nimea_data_string1[]= "AT+CGPSOUT=255\r\n"; //NIMEA DATA ON
 char nimea_data_string2[]= "AT+CGPSOUT=0\r\n";  //NIMEA DATA OFF
-char nimea_data_string3[]= "AT+CGPSPWR=0\r\n";  //NIMEA DATA STATUS
-
 
 if(ON)
 {
@@ -233,7 +240,7 @@ if(ON)
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
-	sleep(10);
+	sleep(1);
 }
 else
 {
@@ -241,16 +248,6 @@ else
 //printf("%s",nimea_data_string2);
 
     RS232_cputs(cport_nr, nimea_data_string2);
-    Resetbufer(buf,sizeof(buf));
-    ReadComport(cport_nr,buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
-
-
-//printf("%s",nimea_data_string3);
-
-    RS232_cputs(cport_nr, nimea_data_string3);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
@@ -290,7 +287,7 @@ char http_string7[]= "AT+HTTPTERM\r\n";
 
 strcpy(device_id_str,"1234567890");
 
-printf("%s",http_string);
+//printf("%s",http_string);
 restart:
     RS232_cputs(cport_nr, http_string);
     Resetbufer(buf,sizeof(buf));
@@ -299,7 +296,7 @@ restart:
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-printf("%s",http_string0);
+//printf("%s",http_string0);
     RS232_cputs(cport_nr, http_string0);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -309,7 +306,7 @@ printf("%s",http_string0);
 
 
 
-printf("%s",http_string1);
+//printf("%s",http_string1);
 
     RS232_cputs(cport_nr, http_string1);
     Resetbufer(buf,sizeof(buf));
@@ -319,7 +316,7 @@ printf("%s",http_string1);
         goto exit;
 
 
-printf("%s",http_string2);
+//printf("%s",http_string2);
 
     RS232_cputs(cport_nr, http_string2);
     Resetbufer(buf,sizeof(buf));
@@ -333,7 +330,7 @@ sleep(1);
 snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s", http_header_str,"device_id=",device_id_str,"&" \
           "latitude=",latitude_str,"&" , "longitude=",longitude_str,"&","updated_time=",updated_time_str,"\"\r\n");
 
-printf("%s",send_string);
+//printf("%s",send_string);
 
     RS232_cputs(cport_nr, send_string);
     Resetbufer(buf,sizeof(buf));
@@ -344,7 +341,7 @@ printf("%s",send_string);
 
 
 
-printf("%s",http_string4);
+//printf("%s",http_string4);
 
     RS232_cputs(cport_nr, http_string4);
     Resetbufer(buf,sizeof(buf));
@@ -354,7 +351,7 @@ printf("%s",http_string4);
         goto exit;
 
 
-printf("%s",http_string5);
+//printf("%s",http_string5);
 
     RS232_cputs(cport_nr, http_string5);
     Resetbufer(buf,sizeof(buf));
@@ -364,7 +361,7 @@ printf("%s",http_string5);
         goto exit;
 
 
-printf("%s",http_string6);
+//printf("%s",http_string6);
 
     RS232_cputs(cport_nr, http_string6);
     Resetbufer(buf,sizeof(buf));
@@ -375,7 +372,7 @@ printf("%s",http_string6);
 
 
 sleep(6);
-printf("%s",http_string7);
+//printf("%s",http_string7);
 
     RS232_cputs(cport_nr, http_string7);
     Resetbufer(buf,sizeof(buf));
@@ -387,9 +384,9 @@ printf("%s",http_string7);
 
 
 
-SUCCESS: printf("\n SEND DATA SUCCESS");
+SUCCESS: printf("\n SEND DATA SUCCESS \n");
 return(1);
-exit: printf("\n SEND DATA FAILED");
+exit: printf("\n SEND DATA FAILED\ n");
 return(0);
 
 }
@@ -406,7 +403,7 @@ char data_connect_string6[]= "AT+CGPADDR=1\r\n";
 
 restart:
 
-printf("%s",data_connect_string1);
+//printf("%s",data_connect_string1);
 
     RS232_cputs(cport_nr, data_connect_string1);
     Resetbufer(buf,sizeof(buf));
@@ -416,7 +413,7 @@ printf("%s",data_connect_string1);
         goto exit;
 
 
-printf("%s",data_connect_string2);
+//printf("%s",data_connect_string2);
 
     RS232_cputs(cport_nr, data_connect_string2);
     Resetbufer(buf,sizeof(buf));
@@ -425,7 +422,7 @@ printf("%s",data_connect_string2);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-printf("%s",data_connect_string3);
+//printf("%s",data_connect_string3);
 
     RS232_cputs(cport_nr, data_connect_string3);
     Resetbufer(buf,sizeof(buf));
@@ -434,7 +431,7 @@ printf("%s",data_connect_string3);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-printf("%s",data_connect_string4);
+//printf("%s",data_connect_string4);
 
     RS232_cputs(cport_nr, data_connect_string4);
     Resetbufer(buf,sizeof(buf));
@@ -444,7 +441,7 @@ printf("%s",data_connect_string4);
         goto exit;
 
 
-printf("%s",data_connect_string5);
+//printf("%s",data_connect_string5);
 
     RS232_cputs(cport_nr, data_connect_string5);
     Resetbufer(buf,sizeof(buf));
@@ -453,7 +450,7 @@ printf("%s",data_connect_string5);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-printf("%s",data_connect_string6);
+//printf("%s",data_connect_string6);
 
     RS232_cputs(cport_nr, data_connect_string6);
     Resetbufer(buf,sizeof(buf));
@@ -462,9 +459,9 @@ printf("%s",data_connect_string6);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-SUCCESS: printf("\nDATA CONNECT SUCCESS");
+SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 return(1);
-exit: printf("DATA CONNECT FAILED");
+exit: printf("DATA CONNECT FAILED \n ");
 return(0);
 
 }

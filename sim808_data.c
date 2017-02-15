@@ -46,7 +46,7 @@ if(!GPSSim808NIMEAData(1))
 		return 0;
 	}
 
-file = fopen( "", "w+" );
+file = fopen(logFileName , "w+" );
 
 while (true) { 
   n = RS232_PollComport(cport_nr,&buff,1 );

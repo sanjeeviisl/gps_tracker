@@ -360,7 +360,7 @@ char ch;
 char *string;
 if(Sim808DataConnect())
      {
-        string = read_file("_gpslog.txt",&size);
+        string = read_file("gpslog.txt",&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {

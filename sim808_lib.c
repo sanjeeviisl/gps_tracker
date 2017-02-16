@@ -284,7 +284,7 @@ char http_string1[]= "AT+SAPBR=1,1\r\n";
 char http_string2[]= "AT+HTTPINIT\r\n";
 //char http_string3[]= "AT+HTTPPARA=\"URL\",\"http://speedfleet.in/speedfleet_control_panel/mapview/addexecutivelocation.php";
 //char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/device_details/add_devices_updated.php?";
-char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://speedfleet.in/speedfleet_control_panel/mapview/addexecutivelocation.php?";	
+char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/gps_mapview/adddevicelocation.php?";	
 char http_string4[]= "AT+HTTPPARA=\"CID\",1\r\n";
 char http_string5[]= "AT+HTTPACTION=0\r\n";
 char http_string6[]= "AT+HTTPREAD\r\n";
@@ -307,13 +307,15 @@ restart:
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	        goto exit;
 
+sleep(8);
 	//printf("%s",http_string0);
 	    RS232_cputs(cport_nr, http_string0);
 	    Resetbufer(buf,sizeof(buf));
 	    ReadComport(cport_nr,buf,6000,500000);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-	        goto exit;
+//	        goto exit;
+sleep(8);
 
 
 
@@ -324,7 +326,8 @@ restart:
 	    ReadComport(cport_nr,buf,6000,500000);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-	        goto exit;
+//	        goto exit;
+sleep(8);
 	//printf("%s",http_string2);
 
 	    RS232_cputs(cport_nr, http_string2);
@@ -334,8 +337,8 @@ restart:
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	        goto exit;
 
-
 sleep(8);
+
 		httpInitialize = true;
 		}
 
@@ -465,8 +468,8 @@ restart:
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        goto exit;
-	sleep(5);
+        //goto exit;
+	sleep(15);
 
 //printf("%s",data_connect_string6);
     dataConnected =true;

@@ -261,7 +261,7 @@ else
 
 }
 
-SUCCESS: printf("\nNIMEA DATA SUCCESS\n");
+SUCCESS:// printf("\nNIMEA DATA SUCCESS\n");
 return(1);
 exit: printf("\nNIMEA DATA FAILED");
 return(0);
@@ -325,9 +325,6 @@ restart:
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	        goto exit;
-		httpInitialize = true;
-		}
-
 	//printf("%s",http_string2);
 
 	    RS232_cputs(cport_nr, http_string2);
@@ -338,7 +335,10 @@ restart:
 	        goto exit;
 
 
-sleep(1);
+sleep(8);
+		httpInitialize = true;
+		}
+
 snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", http_header_str,"device_id=",device_id_str,"&" \
           "latitude=",latitude_str,"&" , "longitude=",longitude_str,"&","utcdate_stamp=",updated_date_str,"&","utctime_stamp=",updated_time_str,"\"\r\n");
 
@@ -383,10 +383,10 @@ sleep(6);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
+
 sleep(4);
-
 //printf("%s",http_string7);
-
+/*
     RS232_cputs(cport_nr, http_string7);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -394,7 +394,8 @@ sleep(4);
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
-
+sleep(4);
+*/
 
 
 SUCCESS: printf("\n SEND DATA SUCCESS \n");

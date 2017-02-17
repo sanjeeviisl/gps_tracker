@@ -6,6 +6,43 @@
 #include <A7_command_serial.h>
 #include <A7_gps_data_serial.h>
 #include <A7_http_data_server.h>
+#include <math.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "sim808_lib.h"
+#include "rs232.h"
+#define true 1
+#define false 0
+
+int sim808_GPSPowerON = false;
+int sim808_httpInitialize = false;
+
+
+extern char * latitude_str;
+extern char * longitude_str;
+extern char updated_time_str[6];
+extern char updated_date_str[8];
+
+
+int sim808_cport_nr=1,    /* /dev/ttyS0 */
+    sim808_bdrate=115200; /* 115200 baud */
+char sim808_mode[]={'8','N','1',0},str[512];
+
+
+
+char sim808_device_id_str[10];
+
+const unsigned char sim808_OKToken[]={"OK"};
+unsigned char sim808_buf[6000];
+int sim808_buf_SIZE=sizeof(sim808_buf);
+
 
 
 //SendTextMessage()
@@ -92,6 +129,8 @@ sleep(1);
 void Send2Pachube()
 {
 
+
+
 char * humidity = "1031";//these 4 line code are imitate the real sensor data, because the demo did't add other sensor, so using 4 string variable to replace.
 char * moisture = "1242";//you can replace these four variable to the real sensor data in your project
 char * temperature = "30";//
@@ -171,3 +210,597 @@ ShowSerialData();
 void ShowSerialData()
 {
 }
+
+
+
+int openA7Port() {
+
+if(RS232_OpenComport(sim808_cport_nr, sim808_bdrate, sim808_mode))
+	{
+    printf("Can not open comport\n");
+    return(0);
+	}
+    return(1);
+	
+}
+int getA7DeviceInfo() {
+
+char device_string1[]= "AT\r\n";
+char device_string2[]= "AT+CGMM\r\n";
+char device_string3[]= "AT+CGMI\r\n";
+
+restart:
+
+//printf("%s",device_string1);
+
+    RS232_cputs(sim808_cport_nr, device_string1);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+
+//printf("%s",device_string2);
+
+    RS232_cputs(sim808_cport_nr, device_string2);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+//printf("%s",device_string3);
+
+    RS232_cputs(sim808_cport_nr, device_string3);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+
+SUCCESS: printf("\nDEVICE INFO SUCCESS\n");
+return(1);
+exit: printf("\nDEVICE INFO FAILED");
+return(0);
+
+	
+}
+
+
+int GPSA7Power(int ON) {
+
+
+char gps_power_string1[]= "AT+CGPSPWR=1\r\n";
+char gps_power_string2[]= "AT+CGPSPWR=0\r\n";
+char gps_power_string3[]= "AT+CGPSSTATUS?\r\n";
+char gps_power_string4[]= "AT+CGPSINF=0\r\n";
+
+
+if(ON)
+{
+//printf("%s",gps_power_string1);
+
+	if(!sim808_GPSPowerON){
+	    RS232_cputs(sim808_cport_nr, gps_power_string1);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+		sleep(40);
+		sim808_GPSPowerON = true;
+
+		}
+
+
+//printf("%s",gps_power_string3);
+
+    RS232_cputs(sim808_cport_nr, gps_power_string3);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+//printf("%s",gps_power_string4);
+
+    RS232_cputs(sim808_cport_nr, gps_power_string4);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+	sim808_GPSPowerON = true;
+
+}
+else
+{
+
+//printf("%s",gps_power_string2);
+	sim808_GPSPowerON = false;
+    RS232_cputs(sim808_cport_nr, gps_power_string2);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+}
+
+
+SUCCESS: printf("\nGPS POWER SUCCESS\n");
+return(1);
+exit: printf("\nGPS POWER FAILED\n");
+return(0);
+
+	
+}
+
+
+
+int GPSA7NIMEAData(int ON) {
+
+
+char nimea_data_string1[]= "AT+CGPSOUT=255\r\n"; //NIMEA DATA ON
+char nimea_data_string2[]= "AT+CGPSOUT=0\r\n";  //NIMEA DATA OFF
+
+if(ON)
+{
+//printf("%s",nimea_data_string1);
+
+    RS232_cputs(sim808_cport_nr, nimea_data_string1);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+	sleep(1);
+}
+else
+{
+
+//printf("%s",nimea_data_string2);
+
+    RS232_cputs(sim808_cport_nr, nimea_data_string2);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+}
+
+SUCCESS: printf("\nNIMEA DATA SUCCESS\n");
+return(1);
+exit: printf("\nNIMEA DATA FAILED");
+return(0);
+
+	
+}
+
+
+
+
+
+int A7DataConnect() {
+	
+	
+char data_connect_string1[]= "AT+CREG?\r\n";
+char data_connect_string2[]= "AT+CGACT?\r\n";
+char data_connect_string3[]= "AT+CMEE=1\r\n";
+char data_connect_string4[]= "AT+CGATT=1\r\n";
+char data_connect_string5[]= "AT+CGACT=1,1\r\n";
+char data_connect_string6[]= "AT+CGPADDR=1\r\n";
+
+restart:
+
+//printf("%s",data_connect_string1);
+
+    RS232_cputs(sim808_cport_nr, data_connect_string1);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+	sleep(2);
+
+//printf("%s",data_connect_string2);
+
+    RS232_cputs(sim808_cport_nr, data_connect_string2);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+	sleep(3);
+
+//printf("%s",data_connect_string3);
+
+    RS232_cputs(sim808_cport_nr, data_connect_string3);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+//printf("%s",data_connect_string4);
+
+    RS232_cputs(sim808_cport_nr, data_connect_string4);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+	sleep(10);
+
+
+//printf("%s",data_connect_string5);
+
+    RS232_cputs(sim808_cport_nr, data_connect_string5);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+	sleep(5);
+
+//printf("%s",data_connect_string6);
+
+    RS232_cputs(sim808_cport_nr, data_connect_string6);
+    Resetbufer(sim808_buf,sizeof(sim808_buf));
+    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+    // Check if "OK" string is present in the received data 
+    if(MapForward(sim808_buf,sim808_buf_SIZE,(unsigned char*)sim808_OKToken,2) == NULL)
+        goto exit;
+
+SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
+return(1);
+exit: printf("DATA CONNECT FAILED \n ");
+return(0);
+
+}
+
+
+int sendA7DataToTCPServer()
+{
+	
+char latitude_string[ 112 ];
+char longitude_string[ 112 ];
+char updated_date_string[ 112 ];
+char updated_time_string[ 112 ];
+
+char tcp_string1[]= "AT+CGATT?\r\n";
+char tcp_string2[]= "AT+CSTT=\"CMNET\"\r\n";
+char tcp_string3[]= "AT+CIICR\r\n";
+char tcp_string4[]= "AT+CIFSR\r\n";
+char tcp_string5[]= "AT+CIPSPRT=0\r\n";
+char tcp_header_str[] = "AT+CIPSTART=\"tcp\",\"www.iisl.co.in\",\"8081\"\r\n";	
+char tcp_string6[]= "AT+CIPSEND\r\n";	
+char tcp_string7[]= "{\"method\": \"put\",\"resource\": \"/feeds/42742/\",\"params\"";
+char tcp_string8[]= ": {},\"body\":";
+char tcp_string9[]= " {\"version\": \"1.0.0\",\"datastreams\": ";
+
+char tcp_string10[]= "[{\"latitude\": \"" ;
+char tcp_string11[]= "70.000" ;
+char tcp_string12[]= "\"},";
+
+char tcp_string13[]= "{\"longitude\": \"" ;
+char tcp_string14[]= "20.0000" ;
+char tcp_string15[]= "\"},";
+
+char tcp_string16[]= "{\"utcdate_stamp\": \"" ;
+char tcp_string17[]= "20.0000" ;
+char tcp_string18[]= "\"},";
+
+
+char tcp_string19[]= "{\"utctime_stamp\": \"" ;
+char tcp_string20[]=  "124050 ";
+char tcp_string21[] = "\"}]}}\r\n";
+
+
+char end_of_file_byte = (char)26;
+
+
+char tcp_string22[]= "AT+CIPCLOSE\r\n";
+
+
+
+
+strcpy(sim808_device_id_str,"1234567890");
+
+//printf("%s",http_string);
+restart:
+
+	if(!sim808_httpInitialize) {
+		//printf("%s",http_string1);
+		    RS232_cputs(sim808_cport_nr, tcp_string1);
+		    Resetbufer(sim808_buf,sizeof(sim808_buf));
+		    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+		        goto exit;
+
+		//printf("%s",http_string2);
+		    RS232_cputs(sim808_cport_nr, tcp_string2);
+		    Resetbufer(sim808_buf,sizeof(sim808_buf));
+		    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+		        goto exit;
+
+
+		//printf("%s",http_string3);
+
+		    RS232_cputs(sim808_cport_nr, tcp_string3);
+		    Resetbufer(sim808_buf,sizeof(sim808_buf));
+		    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+		        goto exit;
+
+		sleep(1);
+		//printf("%s",http_string4);
+			
+			RS232_cputs(sim808_cport_nr, tcp_string4);
+			Resetbufer(sim808_buf,sizeof(sim808_buf));
+			ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+			// Check if "OK" string is present in the received data 
+			if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+				goto exit;
+			sleep(4);
+
+		
+		sim808_httpInitialize = true;
+		}
+
+	//printf("%s",http_string5);
+		
+		RS232_cputs(sim808_cport_nr, tcp_string5);
+		Resetbufer(sim808_buf,sizeof(sim808_buf));
+		ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+			goto exit;
+		sleep(2);
+	
+
+	//printf("%s",http_string6);
+
+	    RS232_cputs(sim808_cport_nr, tcp_string6);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+
+		sleep(3);
+
+		//printf("%s",http_string7);
+
+	    RS232_cputs(sim808_cport_nr, tcp_string7);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+		sleep(10);
+
+
+		//printf("%s",http_string8);
+
+	    RS232_cputs(sim808_cport_nr, tcp_string8);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+		sleep(4);
+
+
+		//printf("%s",http_string9);
+
+	    RS232_cputs(sim808_cport_nr, tcp_string9);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+		sleep(1);
+
+		snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string10,latitude_str,tcp_string12 );
+		snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string13,longitude_str,tcp_string15 );
+		snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string16,updated_date_str,tcp_string18 );
+		snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string19,updated_time_str,tcp_string21 );
+
+		//printf("%s",latitude_string);
+		
+		RS232_cputs(sim808_cport_nr, latitude_string);
+		RS232_cputs(sim808_cport_nr, longitude_string);
+		RS232_cputs(sim808_cport_nr, updated_date_string);
+		RS232_cputs(sim808_cport_nr, updated_time_string);		
+
+
+		
+		Resetbufer(sim808_buf,sizeof(sim808_buf));
+		ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+			goto exit;
+
+
+	
+		//printf("%s",http_string22);
+
+	    RS232_cputs(sim808_cport_nr, tcp_string22);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+		sleep(4);
+		
+
+
+	SUCCESS: printf("\n SEND DATA SUCCESS \n");
+	return(1);
+	exit: printf("\n SEND DATA FAILED\ n");
+	return(0);
+
+
+
+
+
+}
+
+
+
+int sendA7DataToHttpServer()
+{
+	
+char send_string[ 1024 ];
+char http_string1[]= "AT+CSQ\r\n";
+char http_string2[]= "AT+CGATT?\r\n";
+char http_string3[]= "AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\r\n";
+char http_string4[]= "AT+SAPBR=3,1,\"APN\",\"CMNET\"\r\n";
+char http_string5[]= "AT+SAPBR=1,1\r\n";
+char http_string6[]= "AT+HTTPINIT\r\n";
+char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://speedfleet.in/speedfleet_control_panel/mapview/addexecutivelocation.php?";	
+char http_string7[]= "AT+HTTPACTION=0\r\n";
+char http_string8[]= "AT+HTTPREAD\r\n";
+char http_string9[]= "AT+HTTPTERM\r\n";
+
+strcpy(sim808_device_id_str,"1234567890");
+
+//printf("%s",http_string);
+restart:
+
+	if(!sim808_httpInitialize) {
+		//printf("%s",http_string1);
+		    RS232_cputs(sim808_cport_nr, http_string1);
+		    Resetbufer(sim808_buf,sizeof(sim808_buf));
+		    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+		        goto exit;
+
+		//printf("%s",http_string2);
+		    RS232_cputs(sim808_cport_nr, http_string2);
+		    Resetbufer(sim808_buf,sizeof(sim808_buf));
+		    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+		        goto exit;
+
+
+		//printf("%s",http_string3);
+
+		    RS232_cputs(sim808_cport_nr, http_string3);
+		    Resetbufer(sim808_buf,sizeof(sim808_buf));
+		    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+		        goto exit;
+
+		sleep(1);
+		//printf("%s",http_string4);
+			
+			RS232_cputs(sim808_cport_nr, http_string4);
+			Resetbufer(sim808_buf,sizeof(sim808_buf));
+			ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+			// Check if "OK" string is present in the received data 
+			if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+				goto exit;
+			sleep(4);
+
+		//printf("%s",http_string5);
+			
+			RS232_cputs(sim808_cport_nr, http_string5);
+			Resetbufer(sim808_buf,sizeof(sim808_buf));
+			ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+			// Check if "OK" string is present in the received data 
+			if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+				goto exit;
+			sleep(2);
+
+		
+		sim808_httpInitialize = true;
+		}
+
+	//printf("%s",http_string6);
+
+	    RS232_cputs(sim808_cport_nr, http_string6);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+
+
+		sleep(3);
+		snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", http_header_str,"device_id=",sim808_device_id_str,"&" \
+		          "latitude=",latitude_str,"&" , "longitude=",longitude_str,"&","utcdate_stamp=",updated_date_str,"&","utctime_stamp=",updated_time_str,"\"\r\n");
+
+		//printf("%s",send_string);
+
+	    RS232_cputs(sim808_cport_nr, send_string);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+
+
+
+		//printf("%s",http_string7);
+
+	    RS232_cputs(sim808_cport_nr, http_string7);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+		sleep(10);
+
+
+		//printf("%s",http_string8);
+
+	    RS232_cputs(sim808_cport_nr, http_string8);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+		sleep(4);
+
+
+		//printf("%s",http_string9);
+
+	    RS232_cputs(sim808_cport_nr, http_string9);
+	    Resetbufer(sim808_buf,sizeof(sim808_buf));
+	    ReadComport(sim808_cport_nr,sim808_buf,6000,500000);
+	    // Check if "OK" string is present in the received data 
+	    if(MapForward(sim808_buf,sim808_OKToken,(unsigned char*)sim808_OKToken,2) == NULL)
+	        goto exit;
+
+
+		sleep(1);
+
+
+	SUCCESS: printf("\n SEND DATA SUCCESS \n");
+	return(1);
+	exit: printf("\n SEND DATA FAILED\ n");
+	return(0);
+
+
+
+
+
+}
+
+
+
+
+
+

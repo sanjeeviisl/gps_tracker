@@ -366,15 +366,15 @@ if(Sim808DataConnect())
           {
           ch = string[i];
           parseGPSNIMEADATA(ch);
-          if(count>1)
+          if(count>0)
                 {
                  printf("\nsending data to web server \n");
                  sendDataToServer();
                  count =0;
                 }
           }
-		//release_file(string);
-		//string = NULL;
+		release_file(string);
+		string = NULL;
 		
 	//	strcpy(newFileName,updated_time_str);
  	 //   strcat(newFileName,updated_date_str);

@@ -212,7 +212,7 @@ void parseDataSIM808GPS(void){
         // parse bearing
         gps.bearing = strtof(gps.words[8], NULL);
 
-		strncpy(updated_date_str,gps.words[1],8);
+	strncpy(updated_date_str,gps.words[9],8);
         // parse UTC date
         gps.UTCDay = charToInt(gps.words[9][0]) * 10 + charToInt(gps.words[9][1]);
         gps.UTCMonth = charToInt(gps.words[9][2]) * 10 + charToInt(gps.words[9][3]);

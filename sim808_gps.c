@@ -168,7 +168,6 @@ void parseDataSIM808GPS(void){
 
         printf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
         printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
-        count++;
        // sleep(1); 
         // data ready
         gps.flagDataReady = true;
@@ -221,7 +220,8 @@ void parseDataSIM808GPS(void){
 		
         printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
         printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);
-        sleep(1); 
+        //sleep(1); 
+        count++;
         // data ready
         gps.flagDataReady = true;
     }//$GPRMC
@@ -360,7 +360,7 @@ char ch;
 char *string;
 if(Sim808DataConnect())
      {
-        string = read_file("gpslog.txt",&size);
+        string = read_file("_gpslog.txt",&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
@@ -376,11 +376,11 @@ if(Sim808DataConnect())
 		//release_file(string);
 		//string = NULL;
 		
-		strcpy(newFileName,updated_time_str);
- 	    strcat(newFileName,updated_date_str);
-		strcat(newFileName,logFileName);
+	//	strcpy(newFileName,updated_time_str);
+ 	 //   strcat(newFileName,updated_date_str);
+	//	strcat(newFileName,logFileName);
 		
-		system("mv logFileName newFileName");
+	//	system("mv logFileName newFileName");
      }
 else
 	{

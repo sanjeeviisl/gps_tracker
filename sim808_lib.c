@@ -14,8 +14,9 @@
 #define false 0
 
 int gpsPowerON = false;
-int httpInitialize = false;
 
+int httpInitialize = false;
+int dataConnected = false;
 
 extern char * latitude_str;
 extern char * longitude_str;
@@ -289,7 +290,10 @@ char http_string5[]= "AT+HTTPACTION=0\r\n";
 char http_string6[]= "AT+HTTPREAD\r\n";
 char http_string7[]= "AT+HTTPTERM\r\n";
 
-
+if(longitude_str == NULL || longitude_str == NULL){
+	printf("\n NO DATA SEND \n");
+	return 1;
+}
 strcpy(device_id_str,"1234567890");
 
 //printf("%s",http_string);
@@ -368,6 +372,7 @@ snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
+sleep(6);
 
 //printf("%s",http_string6);
 
@@ -378,8 +383,8 @@ snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
         goto exit;
 
+sleep(4);
 
-sleep(6);
 //printf("%s",http_string7);
 
     RS232_cputs(cport_nr, http_string7);
@@ -413,6 +418,7 @@ restart:
 
 //printf("%s",data_connect_string1);
 
+	if(!dataConnected) {
     RS232_cputs(cport_nr, data_connect_string1);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -462,7 +468,8 @@ restart:
 	sleep(5);
 
 //printf("%s",data_connect_string6);
-
+    dataConnected =true;
+    }
     RS232_cputs(cport_nr, data_connect_string6);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);

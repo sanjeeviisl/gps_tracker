@@ -62,7 +62,7 @@ while (true) {
   
   if(buff == '$') count++;
   
-  if(count > 60) break;
+  if(count > 10) break;
   }
 
 quit:

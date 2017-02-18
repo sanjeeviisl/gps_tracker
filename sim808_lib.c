@@ -112,6 +112,64 @@ if(RS232_OpenComport(cport_nr, bdrate, mode))
     return(1);
 	
 }
+
+int resetHardSim808GSMModule() {
+     printf("going to reset the GSM Module... ");
+	 //TBD
+     sleep(10);
+	getSim808DeviceInfo();
+}
+
+
+int resetHardSim808GPSModule(int n) {
+	
+	char gps_power_cold_reset[]= "AT+CGPSRST=0\r\n";
+	char gps_power_hot_reset[]= "AT+CGPSRST=1\r\n";
+	char gps_power_warm_reset1[]= "AT+CGPSRST=2\r\n";
+	if(n == 0)
+	{
+			RS232_cputs(cport_nr, gps_power_cold_reset);
+			Resetbufer(buf,sizeof(buf));
+			ReadComport(cport_nr,buf,6000,500000);
+			// Check if "OK" string is present in the received data 
+			if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+				goto exit;
+	sleep(20);
+	}
+	
+	if(n == 1)
+	{
+			RS232_cputs(cport_nr, gps_power_hot_reset);
+			Resetbufer(buf,sizeof(buf));
+			ReadComport(cport_nr,buf,6000,500000);
+			// Check if "OK" string is present in the received data 
+			if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+				goto exit;
+	sleep(15);
+	}
+
+	if(n == 2)
+	{
+			RS232_cputs(cport_nr, gps_power_warm_reset1);
+			Resetbufer(buf,sizeof(buf));
+			ReadComport(cport_nr,buf,6000,500000);
+			// Check if "OK" string is present in the received data 
+			if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
+				goto exit;
+	sleep(10);
+	}
+
+	SUCCESS: printf("\nGPS RESET SUCCESS\n");
+	return(1);
+	exit: printf("\nGPS RESET FAILED\n");
+		startRecoveryForGPSPowerResetFailed(0);
+	return(0);
+
+
+}
+
+
+
 int getSim808DeviceInfo() {
 
 char device_string1[]= "AT\r\n";
@@ -151,7 +209,9 @@ restart:
 
 SUCCESS: printf("\nDEVICE INFO SUCCESS\n");
 return(1);
-exit: printf("\nDEVICE INFO FAILED");
+exit: printf("\nDEVICE INFO FAILED\n");
+	resetHardSim808GSMModule();
+
 return(0);
 
 	
@@ -178,7 +238,7 @@ if(ON)
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	        goto exit;
-		sleep(40);
+		sleep(30);
 		gpsPowerON = true;
 
 		}
@@ -222,6 +282,7 @@ else
 SUCCESS: printf("\nGPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED\n");
+	startRecoveryForGPSPowerFailed();
 return(0);
 
 	
@@ -264,6 +325,8 @@ else
 SUCCESS:// printf("\nNIMEA DATA SUCCESS\n");
 return(1);
 exit: printf("\nNIMEA DATA FAILED");
+startRecoveryForGPSNimeaDataFailed();
+
 return(0);
 
 	
@@ -314,8 +377,8 @@ sleep(8);
 	    ReadComport(cport_nr,buf,6000,500000);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-//	        goto exit;
-sleep(8);
+	        goto exit;
+sleep(1);
 
 
 
@@ -326,8 +389,8 @@ sleep(8);
 	    ReadComport(cport_nr,buf,6000,500000);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-//	        goto exit;
-sleep(8);
+	        goto exit;
+sleep(1);
 	//printf("%s",http_string2);
 
 	    RS232_cputs(cport_nr, http_string2);
@@ -404,13 +467,16 @@ sleep(4);
 SUCCESS: printf("\n SEND DATA SUCCESS \n");
 return(1);
 exit: printf("\n SEND DATA FAILED\ n");
+startRecoveryForSendDataFailed(0);
+
+    
 return(0);
 
 }
 
 int Sim808DataConnect() {
 	
-	
+int  n =0;	
 char data_connect_string1[]= "AT+CREG?\r\n";
 char data_connect_string2[]= "AT+CGACT?\r\n";
 char data_connect_string3[]= "AT+CMEE=1\r\n";
@@ -418,11 +484,13 @@ char data_connect_string4[]= "AT+CGATT=1\r\n";
 char data_connect_string5[]= "AT+CGACT=1,1\r\n";
 char data_connect_string6[]= "AT+CGPADDR=1\r\n";
 
+
 restart:
 
 //printf("%s",data_connect_string1);
 
 	if(!dataConnected) {
+		n++;
     RS232_cputs(cport_nr, data_connect_string1);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -432,7 +500,7 @@ restart:
 	sleep(2);
 
 //printf("%s",data_connect_string2);
-
+	n++;
     RS232_cputs(cport_nr, data_connect_string2);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -442,7 +510,7 @@ restart:
 	sleep(3);
 
 //printf("%s",data_connect_string3);
-
+	n++;
     RS232_cputs(cport_nr, data_connect_string3);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -451,7 +519,7 @@ restart:
         goto exit;
 
 //printf("%s",data_connect_string4);
-
+	n++;
     RS232_cputs(cport_nr, data_connect_string4);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -462,18 +530,20 @@ restart:
 
 
 //printf("%s",data_connect_string5);
-
+	n++;
     RS232_cputs(cport_nr, data_connect_string5);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
     // Check if "OK" string is present in the received data 
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
-        //goto exit;
-	sleep(15);
+        goto exit;
+	sleep(5);
 
 //printf("%s",data_connect_string6);
     dataConnected =true;
     }
+
+	n++;
     RS232_cputs(cport_nr, data_connect_string6);
     Resetbufer(buf,sizeof(buf));
     ReadComport(cport_nr,buf,6000,500000);
@@ -484,7 +554,64 @@ restart:
 SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 return(1);
 exit: printf("DATA CONNECT FAILED \n ");
+		startRecoveryForDataConnectFailed(n);
+
 return(0);
 
 }
+
+void startRecoveryForDataConnectFailed(int n){
+   	resetHardSim808GSMModule();
+	
+	sendGPSData();
+
+
+}
+
+void startRecoveryForSendDataFailed(int n){
+   	resetHardSim808GSMModule();
+	
+	sendGPSData();
+
+
+}
+
+
+void startRecoveryForGPSNimeaDataFailed(int n){
+   	resetHardSim808GPSModule(1);
+	
+	receiveGPSData();
+
+
+}
+
+
+void startRecoveryForGPSPowerFailed(int n){
+   	resetHardSim808GPSModule(0);
+	
+	receiveGPSData();
+
+
+}
+
+
+void startRecoveryForGPSPowerResetFailed(int n){
+   	resetHardSim808GSMModule();
+	
+	sendGPSData();
+
+
+}
+
+
+void startRecoveryForSendDataFailed2(int n){
+   	resetHardSim808GSMModule();
+	
+	sendGPSData();
+
+
+}
+
+
+
 

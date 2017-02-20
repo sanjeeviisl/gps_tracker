@@ -12,5 +12,6 @@ extern int getSim808DeviceInfo();
 extern int Sim808DataConnect();
 extern int GPSSim808NIMEAData(int ON) ;
 extern int GPSSim808Power(int ON);
+
 #endif
 

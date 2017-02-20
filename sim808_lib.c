@@ -121,11 +121,20 @@ int resetHardSim808GSMModule() {
 }
 
 
+int powerONSim808GSMModule() {
+     printf("Power ON the Sim808 Module : ");
+	 //TBD
+     sleep(4);
+
+}
+
 int resetHardSim808GPSModule(int n) {
 	
 	char gps_power_cold_reset[]= "AT+CGPSRST=0\r\n";
 	char gps_power_hot_reset[]= "AT+CGPSRST=1\r\n";
 	char gps_power_warm_reset1[]= "AT+CGPSRST=2\r\n";
+
+	restart:
 	if(n == 0)
 	{
 			RS232_cputs(cport_nr, gps_power_cold_reset);
@@ -161,9 +170,9 @@ int resetHardSim808GPSModule(int n) {
 
 	SUCCESS: printf("\nGPS RESET SUCCESS\n");
 	return(1);
-	exit: printf("\nGPS RESET FAILED\n");
-		startRecoveryForGPSPowerResetFailed(0);
-	return(0);
+	exit: printf("\nGPS RESET FAILED Try Again\n");
+	goto restart;
+
 
 
 }
@@ -209,8 +218,9 @@ restart:
 
 SUCCESS: printf("\nDEVICE INFO SUCCESS\n");
 return(1);
-exit: printf("\nDEVICE INFO FAILED\n");
-	resetHardSim808GSMModule();
+exit: printf("\nDEVICE INFO FAILED, MAY BE IT is power Off !\n");
+	powerONSim808GSMModule();
+        goto restart;
 
 return(0);
 
@@ -221,6 +231,7 @@ return(0);
 int GPSSim808Power(int ON) {
 
 
+int n;
 char gps_power_string1[]= "AT+CGPSPWR=1\r\n";
 char gps_power_string2[]= "AT+CGPSPWR=0\r\n";
 char gps_power_string3[]= "AT+CGPSSTATUS?\r\n";
@@ -232,6 +243,7 @@ if(ON)
 //printf("%s",gps_power_string1);
 
 	if(!gpsPowerON){
+		n =0;
 	    RS232_cputs(cport_nr, gps_power_string1);
 	    Resetbufer(buf,sizeof(buf));
 	    ReadComport(cport_nr,buf,6000,500000);
@@ -245,6 +257,7 @@ if(ON)
 
 
 //printf("%s",gps_power_string3);
+	n =1;
 
     RS232_cputs(cport_nr, gps_power_string3);
     Resetbufer(buf,sizeof(buf));
@@ -254,6 +267,7 @@ if(ON)
         goto exit;
 
 //printf("%s",gps_power_string4);
+	n =2;
 
     RS232_cputs(cport_nr, gps_power_string4);
     Resetbufer(buf,sizeof(buf));
@@ -269,6 +283,8 @@ else
 {
 
 //printf("%s",gps_power_string2);
+	n =4;
+
 	gpsPowerON = false;
     RS232_cputs(cport_nr, gps_power_string2);
     Resetbufer(buf,sizeof(buf));
@@ -282,7 +298,7 @@ else
 SUCCESS: printf("\nGPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED\n");
-	startRecoveryForGPSPowerFailed();
+	startRecoveryForGPSPowerFailed(n);
 return(0);
 
 	
@@ -295,6 +311,8 @@ int GPSSim808NIMEAData(int ON) {
 
 char nimea_data_string1[]= "AT+CGPSOUT=255\r\n"; //NIMEA DATA ON
 char nimea_data_string2[]= "AT+CGPSOUT=0\r\n";  //NIMEA DATA OFF
+
+restart:
 
 if(ON)
 {
@@ -324,11 +342,9 @@ else
 
 SUCCESS:// printf("\nNIMEA DATA SUCCESS\n");
 return(1);
-exit: printf("\nNIMEA DATA FAILED");
-startRecoveryForGPSNimeaDataFailed();
-
-return(0);
-
+exit: 	printf("\nNIMEA DATA FAILED");
+		startRecoveryForGPSNimeaDataFailed();
+		goto restart;
 	
 }
 
@@ -370,7 +386,7 @@ restart:
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	        goto exit;
 
-sleep(8);
+sleep(4);
 	//printf("%s",http_string0);
 	    RS232_cputs(cport_nr, http_string0);
 	    Resetbufer(buf,sizeof(buf));
@@ -378,7 +394,7 @@ sleep(8);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	        goto exit;
-sleep(1);
+sleep(4);
 
 
 
@@ -390,7 +406,7 @@ sleep(1);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	        goto exit;
-sleep(1);
+sleep(4);
 	//printf("%s",http_string2);
 
 	    RS232_cputs(cport_nr, http_string2);
@@ -467,9 +483,6 @@ sleep(4);
 SUCCESS: printf("\n SEND DATA SUCCESS \n");
 return(1);
 exit: printf("\n SEND DATA FAILED\ n");
-startRecoveryForSendDataFailed(0);
-
-    
 return(0);
 
 }
@@ -554,24 +567,18 @@ restart:
 SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 return(1);
 exit: printf("DATA CONNECT FAILED \n ");
-		startRecoveryForDataConnectFailed(n);
-
 return(0);
 
 }
 
 void startRecoveryForDataConnectFailed(int n){
    	resetHardSim808GSMModule();
-	
-	sendGPSData();
-
 
 }
 
 void startRecoveryForSendDataFailed(int n){
    	resetHardSim808GSMModule();
 	
-	sendGPSData();
 
 
 }
@@ -580,17 +587,12 @@ void startRecoveryForSendDataFailed(int n){
 void startRecoveryForGPSNimeaDataFailed(int n){
    	resetHardSim808GPSModule(1);
 	
-	receiveGPSData();
-
-
 }
 
 
 void startRecoveryForGPSPowerFailed(int n){
-   	resetHardSim808GPSModule(0);
+   	resetHardSim808GPSModule(n);
 	
-	receiveGPSData();
-
 
 }
 
@@ -598,18 +600,13 @@ void startRecoveryForGPSPowerFailed(int n){
 void startRecoveryForGPSPowerResetFailed(int n){
    	resetHardSim808GSMModule();
 	
-	sendGPSData();
 
 
 }
 
 
-void startRecoveryForSendDataFailed2(int n){
+void startRecoveryForReceiveDataFailed(int n){
    	resetHardSim808GSMModule();
-	
-	sendGPSData();
-
-
 }
 
 

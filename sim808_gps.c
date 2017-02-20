@@ -369,9 +369,16 @@ if(Sim808DataConnect())
           if(count>0)
                 {
                  printf("\nsending data to web server \n");
-                 sendDataToServer();
                  count =0;
+                 if(sendDataToServer())
+				 	printf("\send data Ok!\n");
+				 else
+				 	{
+				 	goto exit;
+				 	}
                 }
+		  	else
+				printf("\No Valid data is there\n");
           }
 		release_file(string);
 		string = NULL;
@@ -385,9 +392,13 @@ if(Sim808DataConnect())
 else
 	{
 	printf("\n GPSRS Data is not connected !!!");
-	return(0);
+	goto exit;
 	}
+
+SUCCESS: printf("\n sendGPSData SUCCESS \n");
 return(1);
+exit: printf("\n sendGPSData FAILED\ n");
+return(0);
 
 }
 

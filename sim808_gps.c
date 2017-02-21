@@ -362,7 +362,7 @@ char ch;
 char *string;
 if(Sim808DataConnect())
      {
-        string = read_file("gpslog.txt",&size);
+        string = read_file("_gpslog.txt",&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
@@ -379,8 +379,6 @@ if(Sim808DataConnect())
 				 	goto exit;
 				 	}
                 }
-		  	else
-				printf("\No Valid data is there\n");
           }
 		release_file(string);
 		string = NULL;

@@ -61,16 +61,12 @@ while (true) {
   if(count > 10) break;
   fputc(buff, file);
   //printf("%c", buff);
-  
-  
   }
 
 quit:
    fclose (file);
    GPSSim808NIMEAData(0);
-   //sleep(1); 
-   //GPSSim808Power(0); // not required because it need again
-   return n;
+   return 1;
 
    
 }

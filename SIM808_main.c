@@ -28,18 +28,19 @@ void* gpsDataReceiverTask(void *arg)
     while(1)
     {
                 
-        /* entering critical section with semaphore (could use mutex too) */
+     /* entering critical section with semaphore (could use mutex too) */
     sem_wait(&filling_list); // blocks is semaphore 0. If semaphore nonzero,
                              // it decrements semaphore and proceeds
     pthread_mutex_lock(&lock);  
     if(pthread_equal(id,tid[0]))
     {
         printf("\n Receiver  thread processing\n");
-
+		restart:
          if(!receiveGPSData())
 		 	{
-		 	printf("\n Receive Data Not OK");
-			       sleep(50000);
+			printf("\n ReceiveData Not OK, so resetting the module");
+			startRecoveryForReceiveDataFailed(0);
+			goto restart;
          	}
 	         
     }
@@ -68,12 +69,10 @@ void* gpsDataSenderTask(void *arg)
       printf("\n Sender  thread processing\n");
       if(!sendGPSData())
 		   {
-		   printf("\n Send Data Not OK");
-		   Sim808_GPS_GSM_Module_Power();
-		   Sim808_GPS_GSM_Module_Power();
-    pthread_mutex_unlock(&lock);
-    sem_post(&filling_list);
-
+		   printf("\n Send Data Not OK, so resetting the module");
+		   startRecoveryForSendDataFailed(0);
+		   pthread_mutex_unlock(&lock);
+		   sem_post(&filling_list);
   	   		}
     }
         

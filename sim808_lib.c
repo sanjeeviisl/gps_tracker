@@ -129,7 +129,6 @@ dataConnected = false;
 int resetHardSim808GSMModule() {
      printf("going to reset the GSM Module... ");
 	Sim808_GPS_GSM_Module_Power();
-	 //TBD
     sleep(2);
     Sim808_GPS_GSM_Module_Power();
 	getSim808DeviceInfo();
@@ -320,7 +319,7 @@ else
 SUCCESS: printf("\nGPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED\n");
-	startRecoveryForGPSPowerFailed(n);
+	startRecoveryForGPSPowerFailed(0);
 return(0);
 
 	
@@ -383,8 +382,6 @@ char http_string[]= "AT+CREG?\r\n";
 char http_string0[]= "AT+SAPBR=2,1\r\n";
 char http_string1[]= "AT+SAPBR=1,1\r\n";
 char http_string2[]= "AT+HTTPINIT\r\n";
-//char http_string3[]= "AT+HTTPPARA=\"URL\",\"http://speedfleet.in/speedfleet_control_panel/mapview/addexecutivelocation.php";
-//char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/device_details/add_devices_updated.php?";
 char http_header_str[] = "AT+HTTPPARA=\"URL\",\"http://iisl.co.in/gps_control_panel/gps_mapview/adddevicelocation.php?";	
 char http_string4[]= "AT+HTTPPARA=\"CID\",1\r\n";
 char http_string5[]= "AT+HTTPACTION=0\r\n";
@@ -392,7 +389,7 @@ char http_string6[]= "AT+HTTPREAD\r\n";
 char http_string7[]= "AT+HTTPTERM\r\n";
 
 if(longitude_str == NULL || longitude_str == NULL){
-	printf("\n NO DATA SEND \n");
+	printf("\n NO DATA TO SEND \n");
 	return 1;
 }
 strcpy(device_id_str,"1234567890");
@@ -608,7 +605,7 @@ void startRecoveryForSendDataFailed(int n){
 
 
 void startRecoveryForGPSNimeaDataFailed(int n){
-   	resetHardSim808GPSModule(1);
+   	resetHardSim808GPSModule(2);
 	
 }
 
@@ -629,7 +626,7 @@ void startRecoveryForGPSPowerResetFailed(int n){
 
 
 void startRecoveryForReceiveDataFailed(int n){
-   	resetHardSim808GSMModule();
+   	resetHardSim808GPSModule(n);
 }
 
 

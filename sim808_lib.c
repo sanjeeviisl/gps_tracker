@@ -8,16 +8,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include<gpio_lib.h>
 #include "sim808_lib.h"
 #include "rs232.h"
 #define true 1
 #define false 0
 
-int gpsPowerON = false;
 
+int gpsPowerON = false;
 int httpInitialize = false;
 int dataConnected = false;
-
 extern char * latitude_str;
 extern char * longitude_str;
 extern char updated_time_str[6];
@@ -113,17 +113,39 @@ if(RS232_OpenComport(cport_nr, bdrate, mode))
 	
 }
 
+void Sim808_GPS_GSM_Module_Power()
+{
+sunxi_gpio_init();
+sunxi_gpio_set_cfgpin(SUNXI_GPA(7), SUNXI_GPIO_OUTPUT);
+sunxi_gpio_output(SUNXI_GPA(7), 0);
+sleep(2);
+sunxi_gpio_output(SUNXI_GPA(7), 1);
+printf("SIM808 POWR ON OFF\n");
+gpsPowerON = false;
+httpInitialize = false;
+dataConnected = false;
+}
+
 int resetHardSim808GSMModule() {
      printf("going to reset the GSM Module... ");
+	Sim808_GPS_GSM_Module_Power();
 	 //TBD
-     sleep(10);
+    sleep(2);
+    Sim808_GPS_GSM_Module_Power();
 	getSim808DeviceInfo();
 }
 
 
 int powerONSim808GSMModule() {
      printf("Power ON the Sim808 Module : ");
-	 //TBD
+	 Sim808_GPS_GSM_Module_Power();
+     sleep(4);
+
+}
+
+int powerOFFSim808GSMModule() {
+     printf("Power ON the Sim808 Module : ");
+	 Sim808_GPS_GSM_Module_Power();
      sleep(4);
 
 }
@@ -222,7 +244,7 @@ exit: printf("\nDEVICE INFO FAILED, MAY BE IT is power Off !\n");
 	powerONSim808GSMModule();
         goto restart;
 
-return(0);
+return(1);
 
 	
 }
@@ -567,6 +589,7 @@ restart:
 SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 return(1);
 exit: printf("DATA CONNECT FAILED \n ");
+
 return(0);
 
 }

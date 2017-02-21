@@ -341,9 +341,11 @@ if(Sim808DataConnect())
 	  if(count>1)
 		{
 		 printf("\nsending data to web server \n");
-		 sendDataToServer();
+		 if(!sendDataToServer()){
 		 count =0;
+                 goto exit;
 		 sleep(1);
+                    }
 		}  
 	  }
 	SUCCESS: printf("SUCCESS");

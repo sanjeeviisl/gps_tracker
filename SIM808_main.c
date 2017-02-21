@@ -16,7 +16,7 @@ pthread_mutex_t lock;
 sem_t done_filling_list;        /* barrier to sync fill_list threads and empty_list threads */
 sem_t filling_list;             /* to protect threads_fill_done */
 
-
+extern void Sim808_GPS_GSM_Module_Power();
 extern int sendGPSData() ;
 extern int receiveGPSData() ;
 
@@ -69,9 +69,12 @@ void* gpsDataSenderTask(void *arg)
       if(!sendGPSData())
 		   {
 		   printf("\n Send Data Not OK");
- 		   sleep(500);
-  	   		}
+		   Sim808_GPS_GSM_Module_Power();
+		   Sim808_GPS_GSM_Module_Power();
+    pthread_mutex_unlock(&lock);
+    sem_post(&filling_list);
 
+  	   		}
     }
         
     pthread_mutex_unlock(&lock);

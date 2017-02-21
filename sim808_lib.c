@@ -481,7 +481,6 @@ sleep(4);
 SUCCESS: printf("\n SEND DATA SUCCESS \n");
 return(1);
 exit: printf("\n SEND DATA FAILED\ n");
-startRecoveryForSendDataFailed(0);
 
     
 return(0);
@@ -568,9 +567,8 @@ restart:
 SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 return(1);
 exit: printf("DATA CONNECT FAILED \n ");
-		startRecoveryForDataConnectFailed(n);
 
-return(1);
+return(0);
 
 }
 

@@ -14,6 +14,18 @@
 #define true 1
 #define false 0
 
+#define GPS_POWER_SUCCESS 1
+#define NIMEA_DATA_SUCCESS 2
+#define DATA_CONNECT_SUCCESS 3
+#define SEND_DATA_SUCCESS 4
+
+#define GPS_POWER_FAILED 5
+#define NIMEA_DATA_FAILED 6
+#define DATA_CONNECT_FAILED 7
+#define SEND_DATA_FAILED 8
+
+
+
 
 int gpsPowerON = false;
 int httpInitialize = false;
@@ -124,6 +136,50 @@ printf("SIM808 POWR ON OFF\n");
 gpsPowerON = false;
 httpInitialize = false;
 dataConnected = false;
+}
+
+void Sim808_Status_ON_LED(int n)
+{
+
+sunxi_gpio_init();
+sunxi_gpio_set_cfgpin(SUNXI_GPA(n), SUNXI_GPIO_OUTPUT);
+
+switch (n){
+	case GPS_POWER_SUCCESS : 
+		sunxi_gpio_output(SUNXI_GPA(n), 1);		
+		break;
+
+	case NIMEA_DATA_SUCCESS : 
+		sunxi_gpio_output(SUNXI_GPA(n), 1);		
+		break;
+
+	case DATA_CONNECT_SUCCESS : 
+		sunxi_gpio_output(SUNXI_GPA(n), 1);		
+		break;
+
+	case SEND_DATA_SUCCESS: 
+		sunxi_gpio_output(SUNXI_GPA(n), 1);		
+		break;
+
+	default : 
+	}
+	
+}
+
+void Sim808_Status_OFF_LED(int n)
+{
+
+sunxi_gpio_init();
+sunxi_gpio_set_cfgpin(SUNXI_GPA(n), SUNXI_GPIO_OUTPUT);
+
+switch (n){
+	case GPS_POWER_SUCCESS : 
+		sunxi_gpio_output(SUNXI_GPA(n), 0);		
+		break;
+
+	default : 
+	}
+	
 }
 
 int resetHardSim808GSMModule() {

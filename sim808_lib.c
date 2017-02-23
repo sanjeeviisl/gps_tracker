@@ -161,7 +161,7 @@ switch (n){
 		sunxi_gpio_output(SUNXI_GPA(n), 1);		
 		break;
 
-	default : 
+	default : ;
 	}
 	
 }
@@ -177,7 +177,7 @@ switch (n){
 		sunxi_gpio_output(SUNXI_GPA(n), 0);		
 		break;
 
-	default : 
+	default : ;
 	}
 	
 }

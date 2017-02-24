@@ -493,80 +493,90 @@ return(0);
 int A7DataConnect() {
 	
 	
-char data_connect_string1[]= "AT+CREG?\r\n";
-char data_connect_string2[]= "AT+CGACT?\r\n";
-char data_connect_string3[]= "AT+CMEE=1\r\n";
-char data_connect_string4[]= "AT+CGATT=1\r\n";
-char data_connect_string5[]= "AT+CGACT=1,1\r\n";
-char data_connect_string6[]= "AT+CGPADDR=1\r\n";
-
-restart:
-
-//printf("%s",data_connect_string1);
-
-    RS232_cputs(A7_commond_cport_nr, data_connect_string1);
-    Resetbufer(A7_buf,sizeof(A7_buf));
-    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-        goto exit;
-	sleep(2);
-
-//printf("%s",data_connect_string2);
-
-    RS232_cputs(A7_commond_cport_nr, data_connect_string2);
-    Resetbufer(A7_buf,sizeof(A7_buf));
-    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-        goto exit;
-	sleep(3);
-
-//printf("%s",data_connect_string3);
-
-    RS232_cputs(A7_commond_cport_nr, data_connect_string3);
-    Resetbufer(A7_buf,sizeof(A7_buf));
-    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-        goto exit;
-
-//printf("%s",data_connect_string4);
-
-    RS232_cputs(A7_commond_cport_nr, data_connect_string4);
-    Resetbufer(A7_buf,sizeof(A7_buf));
-    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-        goto exit;
-	sleep(10);
-
-
-//printf("%s",data_connect_string5);
-
-    RS232_cputs(A7_commond_cport_nr, data_connect_string5);
-    Resetbufer(A7_buf,sizeof(A7_buf));
-    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-        goto exit;
-	sleep(5);
-
-//printf("%s",data_connect_string6);
-
-    RS232_cputs(A7_commond_cport_nr, data_connect_string6);
-    Resetbufer(A7_buf,sizeof(A7_buf));
-    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
-    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-        goto exit;
-
-SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
-return(1);
-exit: printf("DATA CONNECT FAILED \n ");
-return(0);
-
-}
+		
+	int  n =0;	
+	char data_connect_string1[]= "AT+CREG?\r\n";
+	char data_connect_string2[]= "AT+CGACT?\r\n";
+	char data_connect_string3[]= "AT+CMEE=1\r\n";
+	char data_connect_string4[]= "AT+CGATT=1\r\n";
+	char data_connect_string5[]= "AT+CGACT=1,1\r\n";
+	char data_connect_string6[]= "AT+CGPADDR=1\r\n";
+	
+	
+	restart:
+	
+	//printf("%s",data_connect_string1);
+	
+		if(!A7_dataConnected) {
+			n++;
+		RS232_cputs(A7_commond_cport_nr, data_connect_string1);
+		Resetbufer(A7_buf,sizeof(A7_buf));
+		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+			goto exit;
+		sleep(2);
+	
+	//printf("%s",data_connect_string2);
+		n++;
+		RS232_cputs(A7_commond_cport_nr, data_connect_string2);
+		Resetbufer(A7_buf,sizeof(A7_buf));
+		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+			goto exit;
+		sleep(3);
+	
+	//printf("%s",data_connect_string3);
+		n++;
+		RS232_cputs(A7_commond_cport_nr, data_connect_string3);
+		Resetbufer(A7_buf,sizeof(A7_buf));
+		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+			goto exit;
+	
+	//printf("%s",data_connect_string4);
+		n++;
+		RS232_cputs(A7_commond_cport_nr, data_connect_string4);
+		Resetbufer(A7_buf,sizeof(A7_buf));
+		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+			goto exit;
+		sleep(10);
+	
+	
+	//printf("%s",data_connect_string5);
+		n++;
+		RS232_cputs(A7_commond_cport_nr, data_connect_string5);
+		Resetbufer(A7_buf,sizeof(A7_buf));
+		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+			goto exit;
+		sleep(5);
+	
+	//printf("%s",data_connect_string6);
+		A7_dataConnected =true;
+		}
+	
+		n++;
+		RS232_cputs(A7_commond_cport_nr, data_connect_string6);
+		Resetbufer(A7_buf,sizeof(A7_buf));
+		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		// Check if "OK" string is present in the received data 
+		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+			goto exit;
+	
+	SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
+	return(1);
+	exit: printf("DATA CONNECT FAILED \n ");
+	
+	return(0);
+	
+	}
+	
 
 
 int sendA7DataToTCPServer()

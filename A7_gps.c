@@ -329,7 +329,7 @@ char ch;
 char *string;
 if(A7DataConnect())
      {
-        string = read_file("_gpslog.txt",&size);
+        string = read_file("A7_gpslog.txt",&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {

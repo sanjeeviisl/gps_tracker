@@ -27,7 +27,7 @@
 int receiveA7GPSData() ;
 
 FILE *file;
-char A7_logFileName[]="a7_gpslog.txt";
+char A7_logFileName[]="A7_gpslog.txt";
 
 int receiveA7GPSData() {
 unsigned char buff;

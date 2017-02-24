@@ -81,7 +81,7 @@ int resetHardA7GPSModule(int n) {
 			// Check if "OK" string is present in the received data 
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				goto exit;
-	sleep(20);
+	sleep(10);
 	}
 	
 	if(n == 1)

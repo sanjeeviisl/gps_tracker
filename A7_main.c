@@ -35,14 +35,12 @@ void* gpsA7DataReceiverTask(void *arg)
     pthread_mutex_lock(&lock);  
     if(pthread_equal(id,tid[0]))
     {
-        printf("\n Receiver  thread processing\n");
-
 		 printf("\n Receiver  thread processing\n");
 		 restart:
 		  if(!receiveA7GPSData())
 			 {
 			 printf("\n ReceiveData Not OK, so resetting the module");
-			 startRecoveryForReceiveDataFailed(0);
+			 startRecoveryForA7ReceiveDataFailed(0);
 			 goto restart;
 			 }
 			  

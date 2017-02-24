@@ -8,7 +8,7 @@
 #include <A7_gps_data_serial.h>
 #include <A7_http_data_server.h>
 
-#define SIM808 1
+#define SIM808 0
 int main()
 {
 #if SIM808

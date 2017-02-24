@@ -1,5 +1,5 @@
-#ifndef LIB808_INCLUDED
-#define LIB808_INCLUDED
+#ifndef LIBA7_INCLUDED
+#define LIBA7_INCLUDED
 
 extern int A7_commond_cport_nr;
 

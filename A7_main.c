@@ -71,11 +71,10 @@ void* gpsA7DataSenderTask(void *arg)
     if(pthread_equal(id,tid[1]))
     {
       printf("\n Sender  thread processing\n");
-      if(!sendGPSData())
+      if(!sendA7GPSData())
 		   {
 		   printf("\n Send Data Not OK");
-		  // A7_GPS_GSM_Module_Power();
-		  // A7_GPS_GSM_Module_Power();
+		   A7_GPS_GSM_Module_Power();
 		   pthread_mutex_unlock(&lock);
 		   sem_post(&filling_list);
   	   		}

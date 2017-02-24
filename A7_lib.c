@@ -68,9 +68,9 @@ int powerOFFA7GSMModule() {
 
 int resetHardA7GPSModule(int n) {
 	
-	char gps_power_cold_reset[]= "AT+CGPSRST=0\r\n";
-	char gps_power_hot_reset[]= "AT+CGPSRST=1\r\n";
-	char gps_power_warm_reset1[]= "AT+CGPSRST=2\r\n";
+	char gps_power_cold_reset[]= "AT+GPS=1\r\n";
+	char gps_power_hot_reset[]= "AT+GPS=1\r\n";
+	char gps_power_warm_reset1[]= "AT+GPS=1\r\n";
 
 	restart:
 	if(n == 0)
@@ -762,7 +762,8 @@ restart:
 
 
 
-int sendA7DataToHttpServer()
+
+int sendA7DataToServer()
 {
 	
 char send_string[ 1024 ];

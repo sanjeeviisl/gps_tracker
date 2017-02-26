@@ -49,6 +49,14 @@ const unsigned char A7_Token[]={">"};
 unsigned char A7_buf[6000];
 int A7_buf_SIZE=sizeof(A7_buf);
 
+int resetSoftA7GSMModule(){
+    char gsm_power_soft_reset[]= "AT+RST=1\r\n";
+
+    printf("going to reset the A7 GSM Module... ");
+	RS232_cputs(A7_commond_cport_nr, gsm_power_soft_reset);
+	Resetbufer(A7_buf,sizeof(A7_buf));
+	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+}
 
 int resetHardA7GSMModule() {
 
@@ -237,17 +245,14 @@ if(ON)
 	if(!A7_GPSPowerON){
 	    RS232_cputs(A7_commond_cport_nr, gps_power_string1);
 	    Resetbufer(A7_buf,sizeof(A7_buf));
+   		sleep(20);
 	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
-		sleep(30);
 		A7_GPSPowerON = true;
-
 		}
-
 	A7_GPSPowerON = true;
-
 }
 else
 {
@@ -395,7 +400,7 @@ int A7DataConnect() {
 	SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
-	if(n < 30)
+	if(n < 6)
 		goto restart;
 	else
 		return(0);

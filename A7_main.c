@@ -72,7 +72,7 @@ void* gpsA7DataSenderTask(void *arg)
       if(!sendA7GPSData())
 		   {
 		   printf("\n Send Data Not OK");
-		   A7_GPS_GSM_Module_Power();
+		   resetHardA7GSMModule();
 		   pthread_mutex_unlock(&lock);
 		   sem_post(&filling_list);
   	   		}
@@ -109,11 +109,12 @@ retry1:
 	 {
 	   
 	   printf("\n GPSRS Data is not connected !!!");
-	   	resetHardA7GSMModule();
+	   	resetSoftA7GSMModule();
+		sleep(5);
 	   goto retry1;
     }
 	else
-		printf("\n GPSRS Data is connected !!!");
+		printf("\n GPSRS Data is connected !!!\n");
 
 retry2:
 	if(!GPSA7Power(1))
@@ -123,7 +124,7 @@ retry2:
 
 	}
 	else
-		printf("\n GPS is enabled!!!");
+		printf("\n GPS is enabled!!!\n");
 
 
 

@@ -479,7 +479,7 @@ restart:
 		    // Check if "OK" string is present in the received data 
 		    if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
 		        goto exit;
-
+/*
 		//printf("%s",http_string4);
 			
 			RS232_cputs(A7_commond_cport_nr, tcp_string4);
@@ -491,7 +491,6 @@ restart:
 
 	//printf("%s",http_string5);
 		RS232_cputs(A7_commond_cport_nr, tcp_string5);
-
 	//printf("%s",http_string6);
 	    RS232_cputs(A7_commond_cport_nr, tcp_string6);
 	//printf("%s",http_string7);
@@ -521,7 +520,7 @@ restart:
 	    if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
 		sleep(2);
-	
+*/	
 		//printf("%s",http_string22);
 
 	    RS232_cputs(A7_commond_cport_nr, tcp_string20);

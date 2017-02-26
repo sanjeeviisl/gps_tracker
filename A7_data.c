@@ -34,11 +34,6 @@ unsigned char buff;
 int count = 0 ;
 int  n = 0;
 
-if(!GPSA7Power(1))
-{
-	printf("\n GPS is power ON failed !!!");
-	return 0;
-}
 //sleep(10);
 if(!GPSA7NIMEAData(1))
 	{

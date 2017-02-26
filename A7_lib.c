@@ -26,12 +26,10 @@ int A7_GPSPowerON = false;
 int A7_httpInitialize = false;
 int A7_dataConnected = false;
 
-
-
-extern char * latitude_str;
-extern char * longitude_str;
-extern char updated_time_str[6];
-extern char updated_date_str[8];
+extern char * A7_latitude_str;
+extern char * A7_longitude_str;
+extern char A7_updated_time_str[6];
+extern char A7_updated_date_str[8];
 
 
 int A7_commond_cport_nr=1,    /* /dev/ttyS1 */
@@ -51,18 +49,51 @@ int A7_buf_SIZE=sizeof(A7_buf);
 
 
 int resetHardA7GSMModule() {
-     printf("going to reset the GSM Module... ");
-	Sim808_GPS_GSM_Module_Power();
-    sleep(2);
-    Sim808_GPS_GSM_Module_Power();
-	getSim808DeviceInfo();
+
+    char gsm_power_soft_reset[]= "AT+RST=1\r\n";
+
+restart:
+    printf("going to reset the A7 GSM Module... ");
+	RS232_cputs(A7_commond_cport_nr, gsm_power_soft_reset);
+	Resetbufer(A7_buf,sizeof(A7_buf));
+	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+	sleep(10);
+	// Check if "OK" string is present in the received data 
+	if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+		goto exit;
+
+retry1:
+	if(!A7DataConnect())
+	 {
+	   
+	   printf("\n GPSRS Data is not connected !!!");
+	   	resetHardA7GSMModule();
+	   goto retry1;
+    }
+	else
+		printf("\n GPSRS Data is connected !!!");
+
+retry2:
+	if(!GPSA7Power(1))
+	{
+		printf("\n GPS is power ON failed !!!");
+		goto retry2;
+
+	}
+	else
+		printf("\n GPS is enabled!!!");
+
+
+exit: goto restart;
+	
 }
 
 
-int powerOFFA7GSMModule() {
-     printf("Power ON the Sim808 Module : ");
-	 Sim808_GPS_GSM_Module_Power();
+int powerONA7GSMModule() {
+     printf("Power ON the A7 Module : ");
+	 A7_GPS_GSM_Module_Power();
      sleep(4);
+	 getA7DeviceInfo();
 
 }
 
@@ -287,7 +318,6 @@ void ShowSerialData()
 
 
 int openA7Port() {
-
 	if(RS232_OpenComport(A7_commond_cport_nr, A7_commond_bdrate, A7_commond_mode))
 		{
 	    printf("Can not open comport A7_commond_mode\n");
@@ -298,11 +328,7 @@ int openA7Port() {
 		printf("Can not open A7_data_cport_nr\n");
 		return(0);
 		}
-
     return(1);
-
-
-	
 }
 
 void A7_GPS_GSM_Module_Power()
@@ -316,14 +342,6 @@ printf("A7 POWR ON OFF\n");
 A7_GPSPowerON = false;
 A7_httpInitialize = false;
 A7_dataConnected = false;
-}
-
-
-int powerONA7GSMModule() {
-     printf("Power ON the A7 Module : ");
-	 A7_GPS_GSM_Module_Power();
-     sleep(1);
-
 }
 
 int getA7DeviceInfo() {
@@ -395,7 +413,7 @@ if(ON)
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
-		sleep(40);
+		sleep(30);
 		A7_GPSPowerON = true;
 
 		}
@@ -492,8 +510,6 @@ return(0);
 
 int A7DataConnect() {
 	
-	
-		
 	int  n =0;	
 	char data_connect_string1[]= "AT+CREG?\r\n";
 	char data_connect_string2[]= "AT+CGACT?\r\n";
@@ -501,7 +517,8 @@ int A7DataConnect() {
 	char data_connect_string4[]= "AT+CGATT=1\r\n";
 	char data_connect_string5[]= "AT+CGACT=1,1\r\n";
 	char data_connect_string6[]= "AT+CGPADDR=1\r\n";
-	
+
+	char data_disconnect_string1[]= "AT+CGACT=0,1\r\n";
 	
 	restart:
 	
@@ -572,8 +589,10 @@ int A7DataConnect() {
 	SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
-	
-	return(0);
+	if(n < 30)
+		goto restart;
+	else
+		return(0);
 	
 	}
 	
@@ -586,6 +605,9 @@ char latitude_string[ 112 ];
 char longitude_string[ 112 ];
 char updated_date_string[ 112 ];
 char updated_time_string[ 112 ];
+
+//AT+CIPSTART=?
+//AT+CIPSTART="TCP","116.62.28.113",80
 
 char tcp_string1[]= "AT+CGATT?\r\n";
 char tcp_string2[]= "AT+CSTT=\"CMNET\"\r\n";
@@ -618,10 +640,13 @@ char tcp_string21[] = "\"}]}}\r\n";
 
 char end_of_file_byte = (char)26;
 
+char tcp_string_end[1];
+
 
 char tcp_string22[]= "AT+CIPCLOSE\r\n";
 
 
+tcp_string_end[0] = end_of_file_byte;
 
 
 strcpy(A7_device_id_str,"1234567890");
@@ -725,10 +750,10 @@ restart:
 	        goto exit;
 		sleep(1);
 
-		snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string10,latitude_str,tcp_string12 );
-		snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string13,longitude_str,tcp_string15 );
-		snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string16,updated_date_str,tcp_string18 );
-		snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string19,updated_time_str,tcp_string21 );
+		snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string10,A7_latitude_str,tcp_string12 );
+		snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string13,A7_longitude_str,tcp_string15 );
+		snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string16,A7_updated_date_str,tcp_string18 );
+		snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string19,A7_updated_time_str,tcp_string21 );
 
 		//printf("%s",latitude_string);
 		
@@ -857,7 +882,10 @@ restart:
 
 		sleep(3);
 		snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", http_header_str,"device_id=",A7_device_id_str,"&" \
-		          "latitude=",latitude_str,"&" , "longitude=",longitude_str,"&","utcdate_stamp=",updated_date_str,"&","utctime_stamp=",updated_time_str,"\"\r\n");
+		          "latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,"\"\r\n");
+
+//		snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", http_header_str,"device_id=",A7_device_id_str,"&" \
+	//	          "latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,"\"\r\n");
 
 		//printf("%s",send_string);
 

@@ -327,8 +327,6 @@ int i;
 size_t size;
 char ch;
 char *string;
-if(A7DataConnect())
-     {
         string = read_file("A7_gpslog.txt",&size);
         if( string != NULL) 
         for(i= 0 ; i < size ;i++)
@@ -339,7 +337,7 @@ if(A7DataConnect())
                 {
                  printf("\nsending data to web server \n");
                  A7_count =0;
-                 if(sendA7DataToServer())
+                 if(sendA7DataToTCPServer())
 				 	printf("\send data Ok!\n");
 				 else
 				 	{
@@ -355,12 +353,6 @@ if(A7DataConnect())
 	//	strcat(A7_newFileName,logFileName);
 		
 	//	system("mv logFileName A7_newFileName");
-     }
-else
-	{
-	printf("\n GPSRS Data is not connected !!!");
-	goto exit;
-	}
 
 SUCCESS: printf("\n sendGPSData SUCCESS \n");
 return(1);

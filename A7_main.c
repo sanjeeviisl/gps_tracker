@@ -97,11 +97,35 @@ int A7_main()
          return 0;
 	}
 
+
     if(!getA7DeviceInfo())
 	{
          printf("Device is not initialized\n");
          return 0;
 	}
+
+retry1:
+	if(!A7DataConnect())
+	 {
+	   
+	   printf("\n GPSRS Data is not connected !!!");
+	   	resetHardA7GSMModule();
+	   goto retry1;
+    }
+	else
+		printf("\n GPSRS Data is connected !!!");
+
+retry2:
+	if(!GPSA7Power(1))
+	{
+		printf("\n GPS is power ON failed !!!");
+		goto retry2;
+
+	}
+	else
+		printf("\n GPS is enabled!!!");
+
+
 
     res = sem_init(&done_filling_list,  /* pointer to semaphore */
                        0 ,                  /* 0 if shared between threads, 1 if shared between processes */

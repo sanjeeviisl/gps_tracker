@@ -13,6 +13,7 @@ extern int getA7DeviceInfo();
 extern int A7DataConnect();
 extern int GPSA7NIMEAData(int ON) ;
 extern int GPSA7Power(int ON);
+extern resetHardA7GSMModule();
 
 #endif
 

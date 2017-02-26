@@ -465,7 +465,7 @@ restart:
 		    // Check if "OK" string is present in the received data 
 		    if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
 		        goto exit;
-
+/*
 		//printf("%s",http_string2);
 		    RS232_cputs(A7_commond_cport_nr, tcp_string2);
 		    Resetbufer(A7_buf,sizeof(A7_buf));
@@ -484,7 +484,7 @@ restart:
 		    // Check if "OK" string is present in the received data 
 		    if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
 		        goto exit;
-/*
+
 		//printf("%s",http_string4);
 			
 			RS232_cputs(A7_commond_cport_nr, tcp_string4);
@@ -525,7 +525,7 @@ restart:
 	    if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
 		sleep(2);
-*/	
+	
 		//printf("%s",http_string22);
 
 	    RS232_cputs(A7_commond_cport_nr, tcp_string20);
@@ -535,7 +535,7 @@ restart:
 	    if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
 		sleep(1);
-		
+*/		
 	    RS232_cputs(A7_commond_cport_nr, tcp_string21);
 	    Resetbufer(A7_buf,sizeof(A7_buf));
 	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);

@@ -497,10 +497,15 @@ restart:
 	//printf("%s",http_string7);
 	    RS232_cputs(A7_commond_cport_nr, tcp_string7);
 
-		snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string8,A7_latitude_str,tcp_string10 );
-		snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string11,A7_longitude_str,tcp_string13 );
-		snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string14,A7_updated_date_str,tcp_string16 );
-		snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string17,A7_updated_time_str,tcp_string19 );
+		//snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string8,A7_latitude_str,tcp_string10 );
+		//snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string11,A7_longitude_str,tcp_string13 );
+		//snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string14,A7_updated_date_str,tcp_string16 );
+		//snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string17,A7_updated_time_str,tcp_string19 );
+
+		snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string8,tcp_string9,tcp_string10 );
+		snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string11,tcp_string10,tcp_string13 );
+		snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string14,tcp_string15,tcp_string16 );
+		snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string17,tcp_string18,tcp_string19 );
 		
 		RS232_cputs(A7_commond_cport_nr, latitude_string);
 		RS232_cputs(A7_commond_cport_nr, longitude_string);

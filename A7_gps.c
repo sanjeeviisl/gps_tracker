@@ -347,6 +347,7 @@ char *string;
           }
 		release_file(string);
 		string = NULL;
+		sendA7DataToTCPServer();
 		
 	//	strcpy(A7_newFileName,A7_updated_time_str);
  	 //   strcat(A7_newFileName,A7_updated_date_str);

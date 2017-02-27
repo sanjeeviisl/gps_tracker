@@ -19,7 +19,7 @@ sem_t filling_list;             /* to protect threads_fill_done */
 
 extern int sendA7GPSData() ;
 extern int receiveA7GPSData() ;
-//extern void A7_GPS_GSM_Module_Power();
+
 
 void* gpsA7DataReceiverTask(void *arg)
 {
@@ -28,10 +28,8 @@ void* gpsA7DataReceiverTask(void *arg)
 
     while(1)
     {
-                
-        /* entering critical section with semaphore (could use mutex too) */
     sem_wait(&filling_list); // blocks is semaphore 0. If semaphore nonzero,
-                             // it decrements semaphore and proceeds
+
     pthread_mutex_lock(&lock);  
     if(pthread_equal(id,tid[0]))
     {
@@ -76,7 +74,6 @@ void* gpsA7DataSenderTask(void *arg)
 		   pthread_mutex_unlock(&lock);
 		   sem_post(&filling_list);
   	   		}
-
     }
         
     pthread_mutex_unlock(&lock);
@@ -97,20 +94,20 @@ int A7_main()
          return 0;
 	}
 
-
     if(!getA7DeviceInfo())
 	{
          printf("Device is not initialized\n");
          return 0;
 	}
 
+	sleep(20);
+
 retry1:
 	if(!A7DataConnect())
 	 {
-	   
 	   printf("\n GPSRS Data is not connected !!!");
 	   	resetSoftA7GSMModule();
-		sleep(15);
+		sleep(30);
 	   goto retry1;
     }
 
@@ -119,12 +116,11 @@ retry2:
 	{
 		printf("\n GPS is power ON failed !!!");
 		goto retry2;
-
 	}
 
     res = sem_init(&done_filling_list,  /* pointer to semaphore */
-                       0 ,                  /* 0 if shared between threads, 1 if shared between processes */
-                       0);                  /* initial value for semaphore (0 is locked) */
+                       0 ,              /* 0 if shared between threads, 1 if shared between processes */
+                       0);              /* initial value for semaphore (0 is locked) */
     if (res < 0)
     {
         perror("Semaphore initialization failed");
@@ -145,15 +141,10 @@ retry2:
     err = pthread_create(&(tid[0]), NULL, &gpsA7DataReceiverTask, NULL);
     if (err != 0)
        printf("\ncan't create thread :[%s]", strerror(err));
-//    else
-//       printf("\n Receiver Thread created successfully\n");
 
     err = pthread_create(&(tid[1]), NULL, &gpsA7DataSenderTask, NULL);
-
     if (err != 0)
        printf("\ncan't create thread :[%s]", strerror(err));
-//    else
-//       printf("\n Sender Thread created successfully\n");
 
     while(1)
     	{
@@ -163,13 +154,9 @@ retry2:
 	    sem_wait(&done_filling_list);
 		
         printf("Canceling thread\n");
-        s = pthread_cancel(tid[0]);
-//        if (s != 0)
-//            handle_error_en(s, "gpsDataSenderTask pthread_cancel");
 
+        s = pthread_cancel(tid[0]);
         s = pthread_cancel(tid[1]);
-//        if (s != 0)
-//            handle_error_en(s, "gpsDataReceiverTask pthread_cancel");
 
 		sleep(60);
         system("reboot");

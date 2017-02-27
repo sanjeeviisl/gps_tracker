@@ -214,7 +214,8 @@ void parseDataA7GPS(void){
         // parse bearing
         gps.bearing = strtof(gps.words[8], NULL);
 
-	strncpy(A7_updated_date_str,gps.words[9],8);
+		strncpy(A7_updated_date_str,gps.words[9],8);
+		
         // parse UTC date
         gps.UTCDay = charToInt(gps.words[9][0]) * 10 + charToInt(gps.words[9][1]);
         gps.UTCMonth = charToInt(gps.words[9][2]) * 10 + charToInt(gps.words[9][3]);
@@ -333,11 +334,11 @@ char *string;
           {
           ch = string[i];
           parseA7GPSNIMEADATA(ch);
-          if(A7_count>0)
+          if(A7_count>10)
                 {
                  printf("\nsending data to web server \n");
                  A7_count =0;
-                 if(sendA7DataToTCPServer())
+                 if(sendA7DataToTCPServer(0))
 				 	printf("\send data Ok!\n");
 				 else
 				 	{
@@ -347,7 +348,7 @@ char *string;
           }
 		release_file(string);
 		string = NULL;
-		sendA7DataToTCPServer();
+		sendA7DataToTCPServer(1);
 		
 	//	strcpy(A7_newFileName,A7_updated_time_str);
  	 //   strcat(A7_newFileName,A7_updated_date_str);

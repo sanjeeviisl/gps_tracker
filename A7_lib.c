@@ -41,7 +41,7 @@ int A7_data_cport_nr=2,    /* /dev/ttyS2 */
 char A7_data_mode[]={'8','N','1',0},str[512];
 
 
-char A7_device_id_str[10];
+char A7_device_id_str[1024];
 
 const unsigned char A7_OKToken[]={"OK"};
 const unsigned char A7_Token[]={">"};
@@ -220,6 +220,8 @@ restart:
     // Check if "OK" string is present in the received data 
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
+
+	strcpy(A7_device_id_str,A7_buf);
 
 
 SUCCESS: printf("\nDEVICE INFO SUCCESS\n");
@@ -414,7 +416,7 @@ int A7DataConnect() {
 char t_buffer11[10];
 char t_buffer22[10];
 
-int sendA7DataToTCPServer()
+int sendA7DataToTCPServer(int testData)
 {
 
 char send_string[ 1024 ];
@@ -442,13 +444,15 @@ char tcp_string21[]= "at+cifsr\r\n";
 
 tcp_string_end[0] = end_of_file_byte;
 
-//test data should be comment after real data
-strcpy(A7_device_id_str,"1234567890");
-A7_longitude_str=dtostrf(70.8888888,0,6,t_buffer11);
-A7_latitude_str=dtostrf(30.8888888,0,6,t_buffer22);
-strncpy(A7_updated_date_str,"31012017",8);
-strncpy(A7_updated_time_str,"101010",6);
-
+if(testData)
+	{
+	//test data should be comment after real data
+	strcpy(A7_device_id_str,"1234567890");
+	A7_longitude_str=dtostrf(70.8888888,0,6,t_buffer11);
+	A7_latitude_str=dtostrf(30.8888888,0,6,t_buffer22);
+	strncpy(A7_updated_date_str,"31012017",8);
+	strncpy(A7_updated_time_str,"101010",6);
+	}
 
 
 

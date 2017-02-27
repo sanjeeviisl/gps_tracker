@@ -110,11 +110,9 @@ retry1:
 	   
 	   printf("\n GPSRS Data is not connected !!!");
 	   	resetSoftA7GSMModule();
-		sleep(5);
+		sleep(15);
 	   goto retry1;
     }
-	else
-		printf("\n GPSRS Data is connected !!!\n");
 
 retry2:
 	if(!GPSA7Power(1))
@@ -123,10 +121,6 @@ retry2:
 		goto retry2;
 
 	}
-	else
-		printf("\n GPS is enabled!!!\n");
-
-
 
     res = sem_init(&done_filling_list,  /* pointer to semaphore */
                        0 ,                  /* 0 if shared between threads, 1 if shared between processes */

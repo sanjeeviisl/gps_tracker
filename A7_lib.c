@@ -52,7 +52,7 @@ int A7_buf_SIZE=sizeof(A7_buf);
 int resetSoftA7GSMModule(){
     char gsm_power_soft_reset[]= "AT+RST=1\r\n";
 
-    printf("going to reset the A7 GSM Module... ");
+    printf("going to soft reset the A7 GSM Module... ");
 	RS232_cputs(A7_commond_cport_nr, gsm_power_soft_reset);
 	Resetbufer(A7_buf,sizeof(A7_buf));
 	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
@@ -244,12 +244,13 @@ if(ON)
 
 	if(!A7_GPSPowerON){
 	    RS232_cputs(A7_commond_cport_nr, gps_power_string1);
+   		sleep(2);
 	    Resetbufer(A7_buf,sizeof(A7_buf));
-   		sleep(20);
 	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 	    // Check if "OK" string is present in the received data 
 	    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
+   		sleep(20);
 		A7_GPSPowerON = true;
 		}
 	A7_GPSPowerON = true;
@@ -343,7 +344,7 @@ int A7DataConnect() {
 		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-		sleep(2);
+		sleep(1);
 	
 	//printf("%s",data_connect_string2);
 		n++;
@@ -353,7 +354,7 @@ int A7DataConnect() {
 		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-		sleep(3);
+		sleep(1);
 	
 	//printf("%s",data_connect_string3);
 		n++;
@@ -367,23 +368,25 @@ int A7DataConnect() {
 	//printf("%s",data_connect_string4);
 		n++;
 		RS232_cputs(A7_commond_cport_nr, data_connect_string4);
+		sleep(10);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-		sleep(10);
+
 	
 	
 	//printf("%s",data_connect_string5);
 		n++;
 		RS232_cputs(A7_commond_cport_nr, data_connect_string5);
+		sleep(10);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-		sleep(5);
+
 	
 	//printf("%s",data_connect_string6);
 		A7_dataConnected =true;
@@ -400,7 +403,7 @@ int A7DataConnect() {
 	SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
-	if(n < 6)
+	if(n < 9)
 		goto restart;
 	else
 		return(0);
@@ -408,52 +411,46 @@ int A7DataConnect() {
 	}
 	
 
+char t_buffer11[10];
+char t_buffer22[10];
 
 int sendA7DataToTCPServer()
 {
-	
-char latitude_string[ 112 ];
-char longitude_string[ 112 ];
-char updated_date_string[ 112 ];
-char updated_time_string[ 112 ];
+
+char send_string[ 1024 ];
 
 char tcp_string1[]= "at+cipstatus\r\n";
 char tcp_string2[]= "AT+CIPSTART=\"TCP\",\"www.iisl.co.in\",80\r\n";
 char tcp_string3[]= "at+cipstatus\r\n";
 char tcp_string4[]= "AT+CIPSEND\r\n";	
-char tcp_string5[]= "{\"method\": \"put\",\"resource\": \"/feeds/42742/\",\"params\"";
-char tcp_string6[]= ": {},\"body\":\"gps_control_panel\\gps_mapview\\adddevicelocation.php\"";
-char tcp_string7[]= " {\"version\": \"1.0.0\",\"datastreams\": ";
 
-char tcp_string8[]= "[{\"latitude\": \"" ;
-char tcp_string9[]= "70.000" ;
-char tcp_string10[]= "\"},";
+char tcp_header_str[] = "GET http://iisl.co.in/gps_control_panel/gps_mapview/adddevicelocation.php?";	
 
-char tcp_string11[]= "{\"longitude\": \"" ;
-char tcp_string12[]= "20.0000" ;
-char tcp_string13[]= "\"},";
+char tcp_body_str[] = " HTTP/1.0\r\n";
 
-char tcp_string14[]= "{\"utcdate_stamp\": \"" ;
-char tcp_string15[]= "20.0000" ;
-char tcp_string16[]= "\"},";
-
-
-char tcp_string17[]= "{\"utctime_stamp\": \"" ;
-char tcp_string18[]=  "124050 ";
-char tcp_string19[] = "\"}]}}\r\n";
+char tcp_footer_str[] = "Host: www.iisl.co.in:8080\r\n";
 
 
 char end_of_file_byte = (char)26;
 
 char tcp_string_end[1];
-char tcp_string_end1[1]= "\r\n";
+char tcp_string_end1[]= "\r\n";
 
 char tcp_string20[]= "AT+CIPCLOSE\r\n";
 char tcp_string21[]= "at+cifsr\r\n";
 
 
 tcp_string_end[0] = end_of_file_byte;
+
+//test data should be comment after real data
 strcpy(A7_device_id_str,"1234567890");
+A7_longitude_str=dtostrf(70.8888888,0,6,t_buffer11);
+A7_latitude_str=dtostrf(30.8888888,0,6,t_buffer22);
+strncpy(A7_updated_date_str,"31012017",8);
+strncpy(A7_updated_time_str,"101010",6);
+
+
+
 
 //printf("%s",http_string);
 restart:
@@ -494,55 +491,42 @@ restart:
 			//if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_Token,2) == NULL)
 				//goto exit;
 
-	//printf("%s",http_string5);
-		RS232_cputs(A7_commond_cport_nr, tcp_string5);
-	//printf("%s",http_string6);
-	    RS232_cputs(A7_commond_cport_nr, tcp_string6);
-	//printf("%s",http_string7);
-	    RS232_cputs(A7_commond_cport_nr, tcp_string7);
 
-		//snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string8,A7_latitude_str,tcp_string10 );
-		//snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string11,A7_longitude_str,tcp_string13 );
-		//snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string14,A7_updated_date_str,tcp_string16 );
-		//snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string17,A7_updated_time_str,tcp_string19 );
+			snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&", \
+					  "latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",\
+					  A7_updated_time_str,tcp_body_str,tcp_footer_str);
 
-		snprintf( latitude_string, sizeof( latitude_string ), "%s%s%s", tcp_string8,tcp_string9,tcp_string10 );
-		snprintf( longitude_string, sizeof( longitude_string ), "%s%s%s", tcp_string11,tcp_string10,tcp_string13 );
-		snprintf( updated_date_string, sizeof( latitude_string ), "%s%s%", tcp_string14,tcp_string15,tcp_string16 );
-		snprintf( updated_time_string, sizeof( latitude_string ), "%s%s%s", tcp_string17,tcp_string18,tcp_string19 );
+			//printf("%s",send_string);
+			
+			RS232_cputs(A7_commond_cport_nr, send_string);
+			
+		    RS232_cputs(A7_commond_cport_nr, tcp_string_end);
+			RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
+			
+		    Resetbufer(A7_buf,sizeof(A7_buf));
+		    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		    //if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
+		      //  goto exit;
+			sleep(2);
 		
-		RS232_cputs(A7_commond_cport_nr, latitude_string);
-		RS232_cputs(A7_commond_cport_nr, longitude_string);
-		RS232_cputs(A7_commond_cport_nr, updated_date_string);
-		RS232_cputs(A7_commond_cport_nr, updated_time_string);		
+			//printf("%s",http_string22);
 
-	    RS232_cputs(A7_commond_cport_nr, tcp_string_end);
-		RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
-		
-	    Resetbufer(A7_buf,sizeof(A7_buf));
-	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	    // Check if "OK" string is present in the received data 
-	    //if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
-	      //  goto exit;
-		sleep(2);
-	
-		//printf("%s",http_string22);
-
-	    RS232_cputs(A7_commond_cport_nr, tcp_string20);
-	    Resetbufer(A7_buf,sizeof(A7_buf));
-	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	    // Check if "OK" string is present in the received data 
-	  //  if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
-	    //    goto exit;
-		sleep(1);
-		
-	    RS232_cputs(A7_commond_cport_nr, tcp_string21);
-	    Resetbufer(A7_buf,sizeof(A7_buf));
-	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	    // Check if "OK" string is present in the received data 
-//	    if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
-	//        goto exit;
-		sleep(1);
+		    RS232_cputs(A7_commond_cport_nr, tcp_string20);
+		    Resetbufer(A7_buf,sizeof(A7_buf));
+		    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+		  //  if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
+		    //    goto exit;
+			sleep(1);
+			
+		    RS232_cputs(A7_commond_cport_nr, tcp_string21);
+		    Resetbufer(A7_buf,sizeof(A7_buf));
+		    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		    // Check if "OK" string is present in the received data 
+			//if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
+			//     goto exit;
+			sleep(1);
 
 	SUCCESS: printf("\n SEND DATA SUCCESS \n");
 	return(1);

@@ -46,7 +46,7 @@ int buf_SIZE=sizeof(buf);
     //usleep(5000000);  /* sleep for 100 milliSeconds */  
     Resetbufer(buf,sizeof(buf));
 
-	strcpy(buf,"vvvvvvvvvvv  vvv  O1K 11 bufbufbufO2Kbufbufbufbufbufbufbufbufbufbufbufbufbuf");
+	strcpy(buf,"");
 	
     if(MapForward(buf,buf_SIZE,(unsigned char*)OKToken,2) == NULL)
 	{

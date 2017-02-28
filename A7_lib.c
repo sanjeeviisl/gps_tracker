@@ -446,15 +446,15 @@ int sendA7DataToTCPServer(int testData)
 char send_string[ 1024 ];
 
 char tcp_string1[]= "at+cipstatus\r\n";
-char tcp_string2[]= "AT+CIPSTART=\"TCP\",\"www.iisl.co.in\",8080\r\n";
+char tcp_string2[]= "AT+CIPSTART=\"TCP\",\"www.iisl.co.in\",80\r\n";
 char tcp_string3[]= "at+cipstatus\r\n";
 char tcp_string4[]= "AT+CIPSEND\r\n";	
 
-char tcp_header_str[] = "GET gps_control_panel/gps_mapview/adddevicelocation.php?";	
-char send_string1[] = "GET adddevicelocation.php HTTP/1.0\r\n";	
+char tcp_header_str[] = "GET /gps_control_panel/gps_mapview/adddevicelocation.php?";	
+char send_string1[] = "GET /adddevicelocation.php HTTP/1.1\r\n";	
 
 char tcp_body_str[] = " HTTP/1.0\r\n";
-char tcp_footer_str[] = "Host: www.iisl.co.in:8080\r\n";
+char tcp_footer_str[] = "Host: www.iisl.co.in:80\r\n\r\n";
 
 char end_of_file_byte = (char)26;
 

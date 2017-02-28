@@ -129,7 +129,7 @@ void parseDataA7GPS(void){
 //            gps.res_fLatitude = 0;
 //            gps.res_fLongitude = 0;
             gps.flagDataReady = false;
-            printf("\nNo Valid Data");
+           // printf("\nNo Valid Data");
             return;
         }
         
@@ -204,7 +204,7 @@ void parseDataA7GPS(void){
 //            gps.res_fLatitude = 0;
 //            gps.res_fLongitude = 0;
             gps.flagDataReady = false;
-            printf("\nNo Valid signal");
+    //        printf("\nNo Valid signal");
             return;
         }
         gps.dataValid = true;
@@ -356,7 +356,7 @@ char *string;
 		
 	//	system("mv logFileName A7_newFileName");
 
-SUCCESS: printf("\n sendGPSData SUCCESS \n");
+SUCCESS: printf("sendGPSData SUCCESS \n");
 return(1);
 exit: printf("\n sendGPSData FAILED\ n");
 return(0);

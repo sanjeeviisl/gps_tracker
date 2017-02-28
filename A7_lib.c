@@ -224,7 +224,7 @@ restart:
 	strcpy(A7_device_id_str,A7_buf);
 
 
-SUCCESS: printf("\nDEVICE INFO SUCCESS\n");
+SUCCESS: printf("DEVICE INFO SUCCESS\n");
 return(1);
 exit: printf("\nDEVICE INFO FAILED , MAY BE DEVICE IS POWER OFF !\n");
 powerONA7GSMModule();
@@ -282,7 +282,7 @@ else
 }
 
 
-SUCCESS: printf("\nGPS POWER SUCCESS\n");
+SUCCESS: printf("GPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED\n");
 return(0);
@@ -322,6 +322,7 @@ if(ON)
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 	sleep(1);
+	printf("NIMEA DATA STARTED\n");
 }
 else
 {
@@ -335,9 +336,11 @@ else
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 
+	printf("NIMEA DATA STOPPED\n");
+
 }
 
-SUCCESS: printf("\nNIMEA DATA SUCCESS\n");
+SUCCESS: //printf("NIMEA DATA SUCCESS\n");
 return(1);
 exit: printf("\nNIMEA DATA FAILED");
 return(0);
@@ -426,7 +429,7 @@ int A7DataConnect() {
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 	
-	SUCCESS: printf("\nDATA CONNECT SUCCESS \n");
+	SUCCESS: printf("DATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
 	if(n < 9)
@@ -550,7 +553,7 @@ restart:
 			//     goto exit;
 			sleep(1);
 
-	SUCCESS: printf("\n SEND DATA SUCCESS \n");
+	SUCCESS: printf("SEND DATA SUCCESS \n");
 	return(1);
 	exit: printf("\n SEND DATA FAILED\ n");
 	return(0);

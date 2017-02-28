@@ -30,8 +30,9 @@ FILE *file;
 char A7_logFileName[]="A7_gpslog.txt";
 
 int receiveA7GPSData() {
-unsigned char buff;
 int count = 0 ;
+unsigned char buff;
+unsigned char buffer[1025];
 int  n = 0;
 
 //sleep(10);
@@ -61,7 +62,7 @@ while (true) {
 quit:
    fclose (file);
    GPSA7NIMEAData(0);
-   RS232_PollComport(A7_data_cport_nr,&buff,1024 );
+   RS232_PollComport(A7_data_cport_nr,buffer,1024 );
    ClearCOMPortData();
    printf("receiveA7GPSData SUCCESS \n");
    sleep(1);

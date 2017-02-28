@@ -300,8 +300,6 @@ int ClearCOMPortData() {
 	Resetbufer(A7_buf,sizeof(A7_buf));
 	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 	// Check if "OK" string is present in the received data 
-	if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-		goto exit;
 
 }
 

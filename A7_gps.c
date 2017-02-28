@@ -334,12 +334,12 @@ char *string;
           {
           ch = string[i];
           parseA7GPSNIMEADATA(ch);
-          if(A7_count>10)
+          if(A7_count>1)
                 {
-                 printf("\nsending data to web server \n");
+                 printf("sending data to web server \n");
                  A7_count =0;
                  if(sendA7DataToTCPServer(0))
-				 	printf("\send data Ok!\n");
+				 	printf("send data Ok!\n");
 				 else
 				 	{
 				 	goto exit;
@@ -348,7 +348,7 @@ char *string;
           }
 		release_file(string);
 		string = NULL;
-		sendA7DataToTCPServer(1);
+//		sendA7DataToTCPServer(1);
 		
 	//	strcpy(A7_newFileName,A7_updated_time_str);
  	 //   strcat(A7_newFileName,A7_updated_date_str);

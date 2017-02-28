@@ -221,7 +221,7 @@ restart:
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 
-	strcpy(A7_device_id_str,A7_buf);
+	//strcpy(A7_device_id_str,A7_buf);
 
 
 SUCCESS: printf("DEVICE INFO SUCCESS\n");
@@ -456,7 +456,7 @@ char tcp_header_str1[] = "GET /adddevicelocation.php?";
 char tcp_header_str[] = "GET /gps_control_panel/gps_mapview/adddevicelocation.php?";	
 char send_string1[] = "GET /adddevicelocation.php HTTP/1.1\r\n";	
 
-char tcp_body_str[] = " HTTP/1.0\r\n";
+char tcp_body_str[] = " HTTP/1.1\r\n";
 char tcp_footer_str[] = "Host: www.iisl.co.in:80\r\n\r\n";
 
 char end_of_file_byte = (char)26;
@@ -470,10 +470,10 @@ char tcp_string21[]= "at+cifsr\r\n";
 
 tcp_string_end[0] = end_of_file_byte;
 
+	strcpy(A7_device_id_str,"1234567890");
 if(testData)
 	{
 	//test data should be comment after real data
-	strcpy(A7_device_id_str,"1234567890");
 	A7_longitude_str=dtostrf(70.8888888,0,6,t_buffer11);
 	A7_latitude_str=dtostrf(30.8888888,0,6,t_buffer22);
 	strncpy(A7_updated_date_str,"31012017",8);

@@ -61,6 +61,9 @@ while (true) {
 quit:
    fclose (file);
    GPSA7NIMEAData(0);
+   RS232_PollComport(A7_data_cport_nr,&buff,1024 );
+   ClearCOMPortData();
+   sleep(1);
    return 1;
 
    

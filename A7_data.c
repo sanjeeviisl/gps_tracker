@@ -53,7 +53,7 @@ while (true) {
   if (n == 0) {sleep(1); continue;}
   
   if(buff == '$') count++;
-  if(count > 60) break;
+  if(count > 30) break;
   fputc(buff, file);
   //printf("%c", buff);
   }

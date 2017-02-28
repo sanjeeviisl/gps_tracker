@@ -316,6 +316,7 @@ if(ON)
 //printf("%s",nimea_data_string1);
 
     RS232_cputs(A7_commond_cport_nr, nimea_data_string1);
+	sleep(1);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
     // Check if "OK" string is present in the received data 

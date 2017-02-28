@@ -33,7 +33,7 @@ void* gpsA7DataReceiverTask(void *arg)
     pthread_mutex_lock(&lock);  
     if(pthread_equal(id,tid[0]))
     {
-		 printf("\n Receiver  thread processing\n");
+	//	 printf("\n Receiver  thread processing\n");
 		 restart:
 		  if(!receiveA7GPSData())
 			 {
@@ -66,7 +66,7 @@ void* gpsA7DataSenderTask(void *arg)
 	
     if(pthread_equal(id,tid[1]))
     {
-      printf("\n Sender  thread processing\n");
+     // printf("\n Sender  thread processing\n");
       if(!sendA7GPSData())
 		   {
 		   printf("\n Send Data Not OK");

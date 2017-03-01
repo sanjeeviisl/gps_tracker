@@ -72,6 +72,7 @@ restart:
 	if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 		goto exit;
 
+exit:
 retry1:
 	if(!A7DataConnect())
 	 {
@@ -91,7 +92,6 @@ retry2:
 	}
 	else
 		printf("\n GPS is enabled!!!");
-
 
 	
 }
@@ -498,7 +498,7 @@ restart:
 
 
 //snprintf(send_string,sizeof(send_string), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,tcp_body_str);
-snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s %s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&","longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,tcp_body_str);
+snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&","longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,tcp_body_str);
 
 			
 			RS232_cputs(A7_commond_cport_nr, send_string);

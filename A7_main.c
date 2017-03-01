@@ -106,8 +106,8 @@ retry1:
 	if(!A7DataConnect())
 	 {
 	   printf("\n GPSRS Data is not connected !!!");
-	   	resetSoftA7GSMModule();
-		sleep(30);
+	   resetSoftA7GSMModule();
+	   sleep(30);
 	   goto retry1;
     }
 

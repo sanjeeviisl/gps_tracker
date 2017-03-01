@@ -75,10 +75,9 @@ restart:
 retry1:
 	if(!A7DataConnect())
 	 {
-	   
 	   printf("\n GPSRS Data is not connected !!!");
-	   	resetHardA7GSMModule();
-	   goto retry1;
+	   sleep(5);
+	   goto restart;
     }
 	else
 		printf("\n GPSRS Data is connected !!!");
@@ -94,7 +93,7 @@ retry2:
 		printf("\n GPS is enabled!!!");
 
 
-exit: goto restart;
+exit:
 	
 }
 
@@ -103,49 +102,31 @@ int powerONA7GSMModule() {
      printf("Power ON the A7 Module : ");
 	 A7_GPS_GSM_Module_Power();
      sleep(4);
-	 getA7DeviceInfo();
-
 }
+
+
 
 int resetHardA7GPSModule(int n) {
 	
-	char gps_power_cold_reset[]= "AT+GPS=1\r\n";
-	char gps_power_hot_reset[]= "AT+GPS=1\r\n";
-	char gps_power_warm_reset1[]= "AT+GPS=1\r\n";
+	char gps_power_off[]= "AT+GPS=0\r\n";
+	char gps_power_on[]= "AT+GPS=1\r\n";
+	char gps_power_warm_reset1[]= "AT\r\n";
 
 	restart:
-	if(n == 0)
-	{
-			RS232_cputs(A7_commond_cport_nr, gps_power_cold_reset);
+			RS232_cputs(A7_commond_cport_nr, gps_power_off);
+			sleep(10);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-			// Check if "OK" string is present in the received data 
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				goto exit;
-	sleep(10);
-	}
-	
-	if(n == 1)
-	{
-			RS232_cputs(A7_commond_cport_nr, gps_power_hot_reset);
-			Resetbufer(A7_buf,sizeof(A7_buf));
-			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-			// Check if "OK" string is present in the received data 
-			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-				goto exit;
-	sleep(15);
-	}
 
-	if(n == 2)
-	{
-			RS232_cputs(A7_commond_cport_nr, gps_power_warm_reset1);
+
+			RS232_cputs(A7_commond_cport_nr, gps_power_on);
+			sleep(20);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-			// Check if "OK" string is present in the received data 
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				goto exit;
-	sleep(10);
-	}
 
 	SUCCESS: printf("\nGPS RESET SUCCESS\n");
 	return(1);
@@ -193,31 +174,26 @@ char device_string3[]= "AT+CGMI\r\n";
 
 restart:
 
-//printf("%s",device_string1);
-
     RS232_cputs(A7_commond_cport_nr, device_string1);
+	sleep(1);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 
-
-//printf("%s",device_string2);
 
     RS232_cputs(A7_commond_cport_nr, device_string2);
+	sleep(1);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 
-//printf("%s",device_string3);
 
     RS232_cputs(A7_commond_cport_nr, device_string3);
+	sleep(1);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 
@@ -227,9 +203,8 @@ restart:
 SUCCESS: printf("DEVICE INFO SUCCESS\n");
 return(1);
 exit: printf("\nDEVICE INFO FAILED , MAY BE DEVICE IS POWER OFF !\n");
-powerONA7GSMModule();
-
-goto restart;
+	powerONA7GSMModule();
+	goto restart;
 
 	
 }
@@ -249,10 +224,10 @@ if(ON)
    		sleep(2);
 	    Resetbufer(A7_buf,sizeof(A7_buf));
 	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	    // Check if "OK" string is present in the received data 
 	    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
    		sleep(20);
+		printf("GPS POWER ON SUCCESS\n");
 		A7_GPSPowerON = true;
 		}
 	else{
@@ -261,28 +236,28 @@ if(ON)
    		sleep(2);
 	    Resetbufer(A7_buf,sizeof(A7_buf));
 	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	    // Check if "OK" string is present in the received data 
 	    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 	        goto exit;
    		sleep(2);
+		printf("GPS POWER ON SUCCESS\n");
 		A7_GPSPowerON = true;
 		}
 }
 else
 {
 
-//printf("%s",gps_power_string2);
 	A7_GPSPowerON = false;
     RS232_cputs(A7_commond_cport_nr, gps_power_string2);
+	sleep(2);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
+	printf("GPS POWER OFF SUCCESS\n");
 }
 
 
-SUCCESS: printf("GPS POWER SUCCESS\n");
+SUCCESS: //printf("GPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED\n");
 return(0);
@@ -293,13 +268,11 @@ return(0);
 
 int ClearCOMPortData() {
 	
-	char data_string1[]= "AT\r\n"; //NIMEA DATA ON
-
+	char data_string1[]= "AT\r\n"; 
 	RS232_cputs(A7_commond_cport_nr, data_string1);
 	sleep(2);
 	Resetbufer(A7_buf,sizeof(A7_buf));
 	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	// Check if "OK" string is present in the received data 
 
 }
 
@@ -311,13 +284,10 @@ char nimea_data_string2[]= "AT+GPSRD=0\r\n";  //NIMEA DATA OFF
 
 if(ON)
 {
-//printf("%s",nimea_data_string1);
-
     RS232_cputs(A7_commond_cport_nr, nimea_data_string1);
 	sleep(1);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 	sleep(1);
@@ -326,12 +296,10 @@ if(ON)
 else
 {
 
-//printf("%s",nimea_data_string2);
-
     RS232_cputs(A7_commond_cport_nr, nimea_data_string2);
+	sleep(1);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    // Check if "OK" string is present in the received data 
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
 
@@ -348,6 +316,32 @@ return(0);
 }
 
 
+int A7DataDisconnect() {
+	
+	int  n =0;	
+
+	char data_disconnect_string1[]= "AT+CGACT=0,1\r\n";
+	
+	restart:
+		n++;
+		RS232_cputs(A7_commond_cport_nr, data_disconnect_string1);
+		sleep(1);
+		Resetbufer(A7_buf,sizeof(A7_buf));
+		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+			goto exit;
+
+	SUCCESS: printf("DATA DISCONNECT SUCCESS \n");
+	return(1);
+	exit: printf("DATA DISCONNECT FAILED \n ");
+	if(n < 3)
+		goto restart;
+	else
+		return(0);
+	
+	}
+	
+
 int A7DataConnect() {
 	
 	int  n =0;	
@@ -361,22 +355,19 @@ int A7DataConnect() {
 	char data_disconnect_string1[]= "AT+CGACT=0,1\r\n";
 	
 	restart:
-	
-	//printf("%s",data_connect_string1);
-	
-		if(!A7_dataConnected) {
-			n++;
+
+		n++;
+		
 		RS232_cputs(A7_commond_cport_nr, data_connect_string1);
+		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-		sleep(1);
-	
-	//printf("%s",data_connect_string2);
-		n++;
+
 		RS232_cputs(A7_commond_cport_nr, data_connect_string2);
+		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		// Check if "OK" string is present in the received data 
@@ -384,17 +375,14 @@ int A7DataConnect() {
 			goto exit;
 		sleep(1);
 	
-	//printf("%s",data_connect_string3);
-		n++;
 		RS232_cputs(A7_commond_cport_nr, data_connect_string3);
+		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 	
-	//printf("%s",data_connect_string4);
-		n++;
 		RS232_cputs(A7_commond_cport_nr, data_connect_string4);
 		sleep(10);
 		Resetbufer(A7_buf,sizeof(A7_buf));
@@ -405,10 +393,8 @@ int A7DataConnect() {
 
 	
 	
-	//printf("%s",data_connect_string5);
-		n++;
 		RS232_cputs(A7_commond_cport_nr, data_connect_string5);
-		sleep(10);
+		sleep(12);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		// Check if "OK" string is present in the received data 
@@ -416,12 +402,9 @@ int A7DataConnect() {
 			goto exit;
 
 	
-	//printf("%s",data_connect_string6);
-		A7_dataConnected =true;
-		}
 	
-		n++;
 		RS232_cputs(A7_commond_cport_nr, data_connect_string6);
+		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		// Check if "OK" string is present in the received data 
@@ -431,7 +414,7 @@ int A7DataConnect() {
 	SUCCESS: printf("DATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
-	if(n < 9)
+	if(n < 3)
 		goto restart;
 	else
 		return(0);
@@ -507,7 +490,7 @@ restart:
 		      //  goto exit;
 			
 			RS232_cputs(A7_commond_cport_nr, tcp_string4);
-			sleep(2);		
+			sleep(4);		
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 			// Check if ">" string is present in the received data 
@@ -515,21 +498,17 @@ restart:
 				//goto exit;
 
 
-			snprintf( send_string, sizeof( send_string ), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&", \
-					  "latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,
-tcp_body_str);
+//snprintf(send_string,sizeof(send_string), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,tcp_body_str);
+snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s %s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&","longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,tcp_body_str);
 
 			
 			RS232_cputs(A7_commond_cport_nr, send_string);
 //			RS232_cputs(A7_commond_cport_nr, send_string1);
 			RS232_cputs(A7_commond_cport_nr, tcp_footer_str);
 
-
-			sleep(2);			
-
 		    RS232_cputs(A7_commond_cport_nr, tcp_string_end);
 			RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
-			sleep(2);			
+			sleep(5);			
 		    Resetbufer(A7_buf,sizeof(A7_buf));
 		    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		    // Check if "OK" string is present in the received data 

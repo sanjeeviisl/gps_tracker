@@ -334,6 +334,7 @@ void RS232_disableRTS(int comport_number)
 void RS232_cputs(int comport_number, const char *text)  /* sends a string to serial port */
 {
   while(*text != 0)   RS232_SendByte(comport_number, *(text++));
+  sleep(1);
 }
 
 

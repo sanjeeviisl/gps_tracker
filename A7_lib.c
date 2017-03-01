@@ -93,7 +93,6 @@ retry2:
 		printf("\n GPS is enabled!!!");
 
 
-exit:
 	
 }
 

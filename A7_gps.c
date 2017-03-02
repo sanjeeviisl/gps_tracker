@@ -328,26 +328,45 @@ int i;
 size_t size;
 char ch;
 char *string;
-        string = read_file("A7_gpslog.txt",&size);
-        if( string != NULL) 
+int no_data_found;
+
+no_data_found =true;
+
+if(A7DataConnect())
+	{
+    string = read_file("A7_gpslog.txt",&size);
+    if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
           ch = string[i];
           parseA7GPSNIMEADATA(ch);
           if(A7_count>1)
-                {
-                 printf("sending data to web server \n");
-                 A7_count =0;
-                 if(sendA7DataToTCPServer(0))
-				 	printf("send data Ok!\n");
-				 else
-				 	{
-				 	goto exit;
-				 	}
-                }
+            {
+	         no_data_found = false;
+             printf("sending data to web server \n");
+             A7_count =0;
+             if(sendA7DataToTCPServer(0))
+			 	printf("send data Ok!\n");
+			 else
+			 	{
+			 	printf("send data NOT Ok!\n");
+			 	goto exit;
+			 	}
+            }
           }
-		release_file(string);
-		string = NULL;
+	if(no_data_found)
+		{
+		sendA7StatusToTCPServer(0);
+		}
+		
+	release_file(string);
+	string = NULL;
+	A7DataDisconnect();
+	}		
+else
+	{
+ 	goto exit;
+	}
 //		sendA7DataToTCPServer(1);
 		
 	//	strcpy(A7_newFileName,A7_updated_time_str);

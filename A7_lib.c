@@ -351,8 +351,6 @@ int A7DataConnect() {
 	char data_connect_string5[]= "AT+CGACT=1,1\r\n";
 	char data_connect_string6[]= "AT+CGPADDR=1\r\n";
 
-	char data_disconnect_string1[]= "AT+CGACT=0,1\r\n";
-	
 	restart:
 
 		n++;
@@ -361,7 +359,6 @@ int A7DataConnect() {
 		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 
@@ -369,7 +366,6 @@ int A7DataConnect() {
 		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 		sleep(1);
@@ -378,7 +374,6 @@ int A7DataConnect() {
 		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 	
@@ -386,7 +381,6 @@ int A7DataConnect() {
 		sleep(10);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 
@@ -396,7 +390,6 @@ int A7DataConnect() {
 		sleep(12);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 
@@ -406,7 +399,6 @@ int A7DataConnect() {
 		sleep(1);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-		// Check if "OK" string is present in the received data 
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 	

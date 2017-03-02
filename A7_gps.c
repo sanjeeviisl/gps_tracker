@@ -334,7 +334,7 @@ no_data_found =true;
 
 if(A7DataConnect())
 	{
-    string = read_file("A7_gpslog.txt",&size);
+    string = read_file(A7_logFileName,&size);
     if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
@@ -356,7 +356,16 @@ if(A7DataConnect())
           }
 	if(no_data_found)
 		{
-		sendA7StatusToTCPServer(0);
+		sendA7StatusToTCPServer(1);
+		}
+	else
+		{	
+		 printf("Moving File to New Name!\n");
+         sleep(5);
+		 strcpy(A7_newFileName,A7_updated_time_str);
+		 strcat(A7_newFileName,A7_updated_date_str);
+		 strcat(A7_newFileName,A7_logFileName);
+		 system("mv logFileName A7_newFileName");
 		}
 		
 	release_file(string);
@@ -367,13 +376,7 @@ else
 	{
  	goto exit;
 	}
-//		sendA7DataToTCPServer(1);
-		
-	//	strcpy(A7_newFileName,A7_updated_time_str);
- 	 //   strcat(A7_newFileName,A7_updated_date_str);
-	//	strcat(A7_newFileName,logFileName);
-		
-	//	system("mv logFileName A7_newFileName");
+
 
 SUCCESS: printf("sendGPSData SUCCESS \n");
 return(1);

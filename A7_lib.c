@@ -353,7 +353,7 @@ int A7DataConnect() {
 
 	restart:
 
-		if(!A7_dataConnected {
+		if(!A7_dataConnected) {
 		n++;
 		
 		RS232_cputs(A7_commond_cport_nr, data_connect_string1);

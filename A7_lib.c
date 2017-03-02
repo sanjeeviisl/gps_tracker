@@ -28,8 +28,8 @@ int A7_dataConnected = false;
 
 extern char * A7_latitude_str;
 extern char * A7_longitude_str;
-extern char A7_updated_time_str[6];
-extern char A7_updated_date_str[8];
+extern char  A7_updated_time_str[6];
+extern char  A7_updated_date_str[8];
 
 
 int A7_commond_cport_nr=1,    /* /dev/ttyS1 */
@@ -443,7 +443,7 @@ char tcp_string21[]= "at+cifsr\r\n";
 
 
 tcp_string_end[0] = end_of_file_byte;
-
+			Resetbufer(send_string,1024);
 	strcpy(A7_device_id_str,"1234567890");
 if(testData)
 	{
@@ -490,8 +490,8 @@ restart:
 
 
 //snprintf(send_string,sizeof(send_string), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,tcp_body_str);
-snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&","longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,tcp_body_str);
 
+snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&","longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,tcp_body_str);
 			
 			RS232_cputs(A7_commond_cport_nr, send_string);
 //			RS232_cputs(A7_commond_cport_nr, send_string1);
@@ -500,6 +500,7 @@ snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", tcp_h
 		    RS232_cputs(A7_commond_cport_nr, tcp_string_end);
 			RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
 			sleep(5);			
+			Resetbufer(send_string,1024);
 		    Resetbufer(A7_buf,sizeof(A7_buf));
 		    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		    // Check if "OK" string is present in the received data 
@@ -560,7 +561,7 @@ int sendA7StatusToTCPServer(int testData)
 	
 	
 	tcp_string_end[0] = end_of_file_byte;
-	
+			Resetbufer(send_string,1024);	
 		strcpy(A7_device_id_str,"1234567890");
 	if(testData)
 		{
@@ -607,8 +608,7 @@ int sendA7StatusToTCPServer(int testData)
 	
 	
 	//snprintf(send_string,sizeof(send_string), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,tcp_body_str);
-	snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&","longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,tcp_body_str);
-	
+snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&","longitude=",A7_longitude_str,"&","utcdate_stamp=",A7_updated_date_str,"&","utctime_stamp=",A7_updated_time_str,tcp_body_str);	
 				
 				RS232_cputs(A7_commond_cport_nr, send_string);
 	//			RS232_cputs(A7_commond_cport_nr, send_string1);
@@ -616,7 +616,8 @@ int sendA7StatusToTCPServer(int testData)
 	
 				RS232_cputs(A7_commond_cport_nr, tcp_string_end);
 				RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
-				sleep(5);			
+				sleep(5);		
+			Resetbufer(send_string,1024);	
 				Resetbufer(A7_buf,sizeof(A7_buf));
 				ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 				// Check if "OK" string is present in the received data 

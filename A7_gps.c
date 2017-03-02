@@ -370,7 +370,7 @@ if(A7DataConnect())
 		
 	release_file(string);
 	string = NULL;
-	A7DataDisconnect();
+//	A7DataDisconnect();
 	}		
 else
 	{

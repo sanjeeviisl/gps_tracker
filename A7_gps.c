@@ -369,15 +369,15 @@ if(A7DataConnect())
 		{	
 		 printf("Moving File to New Name!\n");
          sleep(5);
-		 //strcpy(A7_newFileName,A7_updated_time_str);
-		 //strcat(A7_newFileName,A7_updated_date_str);
-		 //strcat(A7_newFileName,A7_logFileName);
-		 //system("mv logFileName A7_newFileName");
+		 strcpy(A7_newFileName,A7_updated_time_str);
+		 strcat(A7_newFileName,A7_updated_date_str);
+		 strcat(A7_newFileName,A7_logFileName);
+		 system("mv logFileName A7_newFileName");
 		}
 		
 	release_file(string);
 	string = NULL;
-//	A7DataDisconnect();
+	A7DataDisconnect();
 	}		
 else
 	{

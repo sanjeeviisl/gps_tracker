@@ -372,7 +372,7 @@ if(A7DataConnect())
 		 strcpy(A7_newFileName,A7_updated_time_str);
 		 strcat(A7_newFileName,A7_updated_date_str);
 		 strcat(A7_newFileName,A7_logFileName);
-		 system("mv logFileName A7_newFileName");
+		 system("mv A7_logFileName A7_newFileName");
 		}
 		
 	release_file(string);

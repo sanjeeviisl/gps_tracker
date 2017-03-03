@@ -33,7 +33,9 @@ char * A7_longitude_str;
 char A7_updated_time_str[7];
 char A7_updated_date_str[9];
 char A7_newFileName[26];
-extern char * A7_logFileName;
+
+extern char A7_logFileName[];
+
 
 
 
@@ -338,7 +340,7 @@ no_data_found =true;
 
 if(A7DataConnect())
 	{
-    string = read_file(A7_logFileName,&size);
+    string = read_file(A7_logFileName,&size); //check data
     if( string != NULL) 
         for(i= 0 ; i < size ;i++)
           {
@@ -347,7 +349,7 @@ if(A7DataConnect())
           if(A7_count>1)
             {
 	         no_data_found = false;
-             printf("sending data to web server \n");
+             printf("sending data to web server from file %s \n",A7_logFileName);
              A7_count =0;
              if(sendA7DataToTCPServer(0))
 			 	printf("send data Ok!\n");
@@ -366,10 +368,10 @@ if(A7DataConnect())
 		{	
 		 printf("Moving File to New Name!\n");
          sleep(5);
-		 strcpy(A7_newFileName,A7_updated_time_str);
-		 strcat(A7_newFileName,A7_updated_date_str);
-		 strcat(A7_newFileName,A7_logFileName);
-		 system("mv logFileName A7_newFileName");
+		 //strcpy(A7_newFileName,A7_updated_time_str);
+		 //strcat(A7_newFileName,A7_updated_date_str);
+		 //strcat(A7_newFileName,A7_logFileName);
+		 //system("mv logFileName A7_newFileName");
 		}
 		
 	release_file(string);

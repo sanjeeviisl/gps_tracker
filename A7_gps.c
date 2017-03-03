@@ -33,7 +33,7 @@ char * A7_longitude_str;
 char A7_updated_time_str[7];
 char A7_updated_date_str[9];
 char A7_newFileName[26];
-
+char move_file_name[112];
 extern char A7_logFileName[];
 
 
@@ -372,7 +372,9 @@ if(A7DataConnect())
 		 strcpy(A7_newFileName,A7_updated_time_str);
 		 strcat(A7_newFileName,A7_updated_date_str);
 		 strcat(A7_newFileName,A7_logFileName);
-		 system("mv A7_logFileName A7_newFileName");
+		 snprintf(move_file_name,sizeof(move_file_name),"%s%s%s%s%s", "mv  ", " ",A7_logFileName , " ",A7_newFileName);
+		 system(move_file_name);
+
 		}
 		
 	release_file(string);

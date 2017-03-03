@@ -30,8 +30,8 @@ typedef int bool ;
 int A7_count =0;
 char * A7_latitude_str;
 char * A7_longitude_str;
-char A7_updated_time_str[6];
-char A7_updated_date_str[8];
+char A7_updated_time_str[7];
+char A7_updated_date_str[9];
 char A7_newFileName[26];
 extern char * A7_logFileName;
 
@@ -159,6 +159,9 @@ void parseDataA7GPS(void){
 
 
 		strncpy(A7_updated_time_str,gps.words[1],6);
+		
+		A7_updated_time_str[7]= 0;
+
         // parse number of satellites
         gps.satellitesUsed = (int)strtof(gps.words[7], NULL);
         
@@ -215,6 +218,7 @@ void parseDataA7GPS(void){
         gps.bearing = strtof(gps.words[8], NULL);
 
 		strncpy(A7_updated_date_str,gps.words[9],8);
+		A7_updated_date_str[9]=0;
 		
         // parse UTC date
         gps.UTCDay = charToInt(gps.words[9][0]) * 10 + charToInt(gps.words[9][1]);

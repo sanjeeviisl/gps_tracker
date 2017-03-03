@@ -379,21 +379,23 @@ int A7DataConnect() {
 			goto exit;
 	
 		RS232_cputs(A7_commond_cport_nr, data_connect_string4);
-		sleep(10);
+		sleep(5);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
 
 	
-	
 		RS232_cputs(A7_commond_cport_nr, data_connect_string5);
-		sleep(12);
+		sleep(10);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-                  }
+
+		A7_dataConnected = true;
+
+		}
 	
 	
 		RS232_cputs(A7_commond_cport_nr, data_connect_string6);
@@ -453,6 +455,9 @@ if(testData)
 	A7_latitude_str=dtostrf(30.8888888,0,6,t_buffer22);
 	strncpy(A7_updated_date_str,"31012017",8);
 	strncpy(A7_updated_time_str,"101010",6);
+	
+	A7_updated_time_str[7]= 0;
+	A7_updated_date_str[9] =0 ;
 	}
 
 restart:
@@ -492,7 +497,7 @@ restart:
 
 //snprintf(send_string,sizeof(send_string), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,tcp_body_str);
 
-		snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&latitude=",A7_latitude_str,"&longitude=",A7_longitude_str,"&utcdate_stamp=",A7_updated_time_str,"&utctime_stamp=",A7_updated_time_str,tcp_body_str);
+snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&latitude=",A7_latitude_str,"&longitude=",A7_longitude_str,"&utcdate_stamp=",A7_updated_date_str,"&utctime_stamp=",A7_updated_time_str,tcp_body_str);
 	
 			RS232_cputs(A7_commond_cport_nr, send_string);
 //			RS232_cputs(A7_commond_cport_nr, send_string1);
@@ -571,6 +576,8 @@ int sendA7StatusToTCPServer(int testData)
 		A7_latitude_str=dtostrf(88.8888888,0,6,t_buffer22);
 		strncpy(A7_updated_date_str,"31012017",8);
 		strncpy(A7_updated_time_str,"101010",6);
+		A7_updated_time_str[7]= 0;
+		A7_updated_date_str[9] =0 ;
 		}
 	
 	restart:

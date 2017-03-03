@@ -329,7 +329,7 @@ int A7DataDisconnect() {
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-
+			A7_dataConnected = false;
 	SUCCESS: printf("DATA DISCONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA DISCONNECT FAILED \n ");

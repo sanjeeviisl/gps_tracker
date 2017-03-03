@@ -340,6 +340,7 @@ no_data_found =true;
 
 if(A7DataConnect())
 	{
+	printf("sending data to web server from file %s \n",A7_logFileName);
     string = read_file(A7_logFileName,&size); //check data
     if( string != NULL) 
         for(i= 0 ; i < size ;i++)
@@ -349,7 +350,6 @@ if(A7DataConnect())
           if(A7_count>1)
             {
 	         no_data_found = false;
-             printf("sending data to web server from file %s \n",A7_logFileName);
              A7_count =0;
              if(sendA7DataToTCPServer(0))
 			 	printf("send data Ok!\n");
@@ -362,6 +362,7 @@ if(A7DataConnect())
           }
 	if(no_data_found)
 		{
+		printf("\n No Data Found sending Status to web server from file %s \n",A7_logFileName);
 		sendA7StatusToTCPServer(1);
 		}
 	else

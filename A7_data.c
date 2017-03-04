@@ -42,14 +42,14 @@ if(!GPSA7NIMEAData(1))
 		return 0;
 	}
 
-file = fopen(A7_logFileName , O_WRONLY );
+file = fopen(A7_logFileName ,"w+" );
 if(file == NULL)
     return 0;
 
 while (true) { 
   n = RS232_PollComport(A7_data_cport_nr,&buff,1 );
   if (n == -1) switch(errno) {
-         case EAGAIN:  sleep(1) ;
+         case EAGAIN: // sleep(1) ;
             continue;
          default: goto quit;
          }
@@ -58,7 +58,7 @@ while (true) {
   if(buff == '$') count++;
   if(count > 30) break;
   fputc(buff, file);
-  //printf("%c", buff);
+  printf("%c", buff);
   }
 
 quit:

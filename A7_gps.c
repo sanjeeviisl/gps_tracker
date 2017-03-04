@@ -299,15 +299,15 @@ static char* read_file (const char* filename, size_t* length)
   /* Open the file.  */
   fd = open (filename, O_RDONLY);
 
+  if (fd == NULL) {
+    *length = 0;
+    return NULL;
+  }
+
+
   /* Get information about the file.  */
   fstat (fd, &file_info);
   *length = file_info.st_size;
-  /* Make sure the file is an ordinary file.  */
-  if (!S_ISREG (file_info.st_mode)) {
-    /* It's not, so give up.  */
-    close (fd);
-    return NULL;
-  }
 
   /* Allocate a buffer large enough to hold the file's contents.  */
   buffer = (char*) malloc (*length);
@@ -367,13 +367,13 @@ if(A7DataConnect())
 		}
 	else
 		{	
-		 printf("Moving File to New Name!\n");
-         sleep(5);
-		 strcpy(A7_newFileName,A7_updated_time_str);
-		 strcat(A7_newFileName,A7_updated_date_str);
-		 strcat(A7_newFileName,A7_logFileName);
-		 snprintf(move_file_name,sizeof(move_file_name),"%s%s%s%s%s", "mv  ", " ",A7_logFileName , " ",A7_newFileName);
-		 system(move_file_name);
+		 //printf("Moving File to New Name!\n");
+                 //sleep(5);
+		 //strcpy(A7_newFileName,A7_updated_time_str);
+		 //strcat(A7_newFileName,A7_updated_date_str);
+		 //strcat(A7_newFileName,A7_logFileName);
+		 //snprintf(move_file_name,sizeof(move_file_name),"%s%s%s%s%s", "mv  ", " ",A7_logFileName , " ",A7_newFileName);
+		 //system(move_file_name);
 
 		}
 		

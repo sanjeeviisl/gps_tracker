@@ -87,6 +87,7 @@ int A7_main()
 {
     int i,s = 0;
     int err,res;
+    sleep(40);
     if(!openA7Port())
 	{
          printf("\n Comport is not initialized\n");
@@ -99,7 +100,7 @@ int A7_main()
          return 0;
 	}
 
-	sleep(20);
+	sleep(10);
 
 retry1:
 	if(!A7DataConnect())

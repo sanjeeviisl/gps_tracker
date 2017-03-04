@@ -42,7 +42,9 @@ if(!GPSA7NIMEAData(1))
 		return 0;
 	}
 
-file = fopen(A7_logFileName , "w+" );
+file = fopen(A7_logFileName , O_WRONLY );
+if(file == NULL)
+    return 0;
 
 while (true) { 
   n = RS232_PollComport(A7_data_cport_nr,&buff,1 );

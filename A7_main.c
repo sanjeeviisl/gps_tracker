@@ -87,7 +87,7 @@ int A7_main()
 {
     int i,s = 0;
     int err,res;
-    sleep(40);
+    sleep(10);
     if(!openA7Port())
 	{
          printf("\n Comport is not initialized\n");
@@ -102,14 +102,6 @@ int A7_main()
 
 	sleep(10);
 
-retry1:
-	if(!A7DataConnect())
-	 {
-	   printf("\n GPSRS Data is not connected !!!");
-	   resetSoftA7GSMModule();
-	   sleep(30);
-	   goto retry1;
-    }
 
 retry2:
 	if(!GPSA7Power(1))

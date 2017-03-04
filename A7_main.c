@@ -117,7 +117,7 @@ retry2:
 		printf("\n GPS is power ON failed !!!");
 		goto retry2;
 	}
-
+     sleep(10);
     res = sem_init(&done_filling_list,  /* pointer to semaphore */
                        0 ,              /* 0 if shared between threads, 1 if shared between processes */
                        0);              /* initial value for semaphore (0 is locked) */

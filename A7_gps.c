@@ -32,7 +32,7 @@ int A7_count =0;
 char * A7_latitude_str;
 char * A7_longitude_str;
 char A7_updated_time_str[7];
-char A7_updated_date_str[9];
+char A7_updated_date_str[9]="01012017";
 char A7_newFileName[26];
 char move_file_name[112];
 extern char A7_logFileName[];
@@ -176,6 +176,7 @@ void parseDataA7GPS(void){
 
         printf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
         printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
+		sendA7DataToTCPServer("A7_device1",A7_longitude_str,A7_latitude_str,A7_updated_time_str,A7_updated_date_str);
        // sleep(1); 
         // data ready
         gps.flagDataReady = true;
@@ -348,19 +349,10 @@ if(A7DataConnect())
           {
           ch = string[i];
           parseA7GPSNIMEADATA(ch);
-          if(A7_count>1)
+          if(A7_count>0)
             {
 	         no_data_found = false;
              A7_count =0;
-             if(sendA7DataToTCPServer(0)){
-			 	printf("send data Ok!\n");
-				goto SUCCESS;
-			 	}
-			 else
-			 	{
-			 	printf("send data NOT Ok!\n");
-			 	goto exit;
-			 	}
             }
           }
 	if(no_data_found)

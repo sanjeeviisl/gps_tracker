@@ -14,7 +14,8 @@ extern int A7DataConnect();
 extern int GPSA7NIMEAData(int ON) ;
 extern int GPSA7Power(int ON);
 extern resetHardA7GSMModule();
-extern int sendA7DataToTCPServer(int testData);
+extern int sendA7DataToTCPServer(char * device_id,char * longitude,char * latitude,char * updated_time,char * updated_date);
+
 
 
 #endif

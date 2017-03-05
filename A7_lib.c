@@ -421,7 +421,7 @@ int A7DataConnect() {
 char t_buffer11[10];
 char t_buffer22[10];
 
-int sendA7DataToTCPServer(int testData)
+int sendA7DataToTCPServer(char * device_id,char * longitude,char * latitude,char * updated_time,char * updated_date)
 {
 
 char send_string[ 1024 ];
@@ -448,19 +448,8 @@ char tcp_string21[]= "at+cifsr\r\n";
 
 
 tcp_string_end[0] = end_of_file_byte;
-			Resetbufer(send_string,1024);
-	strcpy(A7_device_id_str,"1234567890");
-if(testData)
-	{
-	//test data should be comment after real data
-	A7_longitude_str=dtostrf(70.8888888,0,6,t_buffer11);
-	A7_latitude_str=dtostrf(30.8888888,0,6,t_buffer22);
-	strncpy(A7_updated_date_str,"31012017",8);
-	strncpy(A7_updated_time_str,"101010",6);
-	
-	A7_updated_time_str[7]= 0;
-	A7_updated_date_str[9] =0 ;
-	}
+
+Resetbufer(send_string,1024);
 
 restart:
 
@@ -496,19 +485,18 @@ restart:
 			//if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_Token,2) == NULL)
 				//goto exit;
 
-
-//snprintf(send_string,sizeof(send_string), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,tcp_body_str);
-
-snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&latitude=",A7_latitude_str,"&longitude=",A7_longitude_str,"&utcdate_stamp=",A7_updated_date_str,"&utctime_stamp=",A7_updated_time_str,tcp_body_str);
+snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",device_id,"&latitude=",latitude,"&longitude=",longitude,"&utcdate_stamp=",updated_date,"&utctime_stamp=",updated_time,tcp_body_str);
 	
 			RS232_cputs(A7_commond_cport_nr, send_string);
-//			RS232_cputs(A7_commond_cport_nr, send_string1);
+
 			RS232_cputs(A7_commond_cport_nr, tcp_footer_str);
 
 		    RS232_cputs(A7_commond_cport_nr, tcp_string_end);
 			RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
+
 			sleep(5);			
-			Resetbufer(send_string,1024);
+
+
 		    Resetbufer(A7_buf,sizeof(A7_buf));
 		    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		    // Check if "OK" string is present in the received data 

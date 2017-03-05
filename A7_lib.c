@@ -121,8 +121,9 @@ int resetHardA7GPSModule(int n) {
 
 
 			RS232_cputs(A7_commond_cport_nr, gps_power_on);
+			sleep(20);
 			Resetbufer(A7_buf,sizeof(A7_buf));
-			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+			ReadComport(A7_commond_cport_nr,A7_buf,6000,5000000);
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				goto exit;
 			sleep(20);

@@ -16,6 +16,7 @@
 #define true 1
 #define false 0
 
+int send_count = 0;
 
 static int charToInt(char c);
 double trunc(double d);
@@ -351,8 +352,10 @@ if(A7DataConnect())
             {
 	         no_data_found = false;
              A7_count =0;
-             if(sendA7DataToTCPServer(0))
+             if(sendA7DataToTCPServer(0)){
 			 	printf("send data Ok!\n");
+				goto SUCCESS;
+			 	}
 			 else
 			 	{
 			 	printf("send data NOT Ok!\n");
@@ -363,7 +366,17 @@ if(A7DataConnect())
 	if(no_data_found)
 		{
 		printf("\n No Data Found sending Status to web server from file %s \n",A7_logFileName);
-		sendA7StatusToTCPServer(1);
+		if(sendA7StatusToTCPServer(1)){
+			 	printf("send status Ok!\n");
+				resetHardA7GPSModule(1);
+				goto SUCCESS;
+			 	}
+		
+		else
+		   {
+		   printf("send status NOT Ok!\n");
+		   goto exit;
+		   }
 		}
 	else
 		{	
@@ -379,7 +392,13 @@ if(A7DataConnect())
 		
 	release_file(string);
 	string = NULL;
-	//A7DataDisconnect();
+	if(send_count > 20)
+		{
+		A7DataDisconnect();
+		sleep(1);
+		A7DataConnect();
+		send_count = 0;
+		}
 	}		
 else
 	{
@@ -388,6 +407,8 @@ else
 
 
 SUCCESS: printf("sendGPSData SUCCESS \n");
+		send_count++;
+
 return(1);
 exit: printf("\n sendGPSData FAILED\ n");
 return(0);

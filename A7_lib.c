@@ -113,7 +113,7 @@ int resetHardA7GPSModule(int n) {
 
 	restart:
 			RS232_cputs(A7_commond_cport_nr, gps_power_off);
-			sleep(10);
+			sleep(1);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
@@ -121,11 +121,11 @@ int resetHardA7GPSModule(int n) {
 
 
 			RS232_cputs(A7_commond_cport_nr, gps_power_on);
-			sleep(20);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				goto exit;
+			sleep(20);
 
 	SUCCESS: printf("\nGPS RESET SUCCESS\n");
 	return(1);
@@ -320,6 +320,7 @@ int A7DataDisconnect() {
 	int  n =0;	
 
 	char data_disconnect_string1[]= "AT+CGACT=0,1\r\n";
+	A7_dataConnected = false;
 	
 	restart:
 		n++;
@@ -329,7 +330,8 @@ int A7DataDisconnect() {
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 			goto exit;
-			A7_dataConnected = false;
+
+	
 	SUCCESS: printf("DATA DISCONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA DISCONNECT FAILED \n ");

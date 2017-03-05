@@ -49,7 +49,7 @@ if(file == NULL)
 while (true) { 
   n = RS232_PollComport(A7_data_cport_nr,&buff,1 );
   if (n == -1) switch(errno) {
-         case EAGAIN: // sleep(1) ;
+         case EAGAIN:  sleep(1) ;
             continue;
          default: goto quit;
          }

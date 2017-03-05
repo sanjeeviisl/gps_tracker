@@ -278,7 +278,7 @@ int ClearCOMPortData() {
 int GPSA7NIMEAData(int ON) {
 
 
-char nimea_data_string1[]= "AT+GPSRD=2\r\n"; //NIMEA DATA ON
+char nimea_data_string1[]= "AT+GPSRD=1\r\n"; //NIMEA DATA ON
 char nimea_data_string2[]= "AT+GPSRD=0\r\n";  //NIMEA DATA OFF
 
 if(ON)

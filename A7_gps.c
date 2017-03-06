@@ -179,6 +179,7 @@ void parseDataA7GPS(void){
 		sendA7DataToTCPServer("A7_device1",A7_longitude_str,A7_latitude_str,A7_updated_time_str,A7_updated_date_str);
        // sleep(1); 
         // data ready
+        A7_count++;
         gps.flagDataReady = true;
     }//$GPGGA
 
@@ -232,7 +233,6 @@ void parseDataA7GPS(void){
         printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
         printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);
         //sleep(1); 
-        A7_count++;
         // data ready
         gps.flagDataReady = true;
     }//$GPRMC

@@ -171,6 +171,8 @@ int getA7DeviceInfo() {
 char device_string1[]= "AT\r\n";
 char device_string2[]= "AT+CGMM\r\n";
 char device_string3[]= "AT+CGMI\r\n";
+char device_string4[]= "ATE0\r\n";
+
 
 restart:
 
@@ -198,6 +200,13 @@ restart:
         goto exit;
 
 	//strcpy(A7_device_id_str,A7_buf);
+
+    RS232_cputs(A7_commond_cport_nr, device_string4);
+	sleep(1);
+    Resetbufer(A7_buf,sizeof(A7_buf));
+    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+        goto exit;
 
 
 SUCCESS: printf("DEVICE INFO SUCCESS\n");

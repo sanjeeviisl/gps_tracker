@@ -324,9 +324,9 @@ static char* read_file (const char* filename, size_t* length)
 
 static void release_file (char* buffer)
 {
-
 free(buffer);
-
+snprintf(move_file_name,sizeof(move_file_name),"%s%s%s", "rm ", " ",A7_logFileName);
+system(move_file_name);
 }
 
 

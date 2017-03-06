@@ -61,6 +61,7 @@ while (true) {
   //printf("%c", buff);
   }
 
+
 quit:
    fclose (file);
    GPSA7NIMEAData(0);

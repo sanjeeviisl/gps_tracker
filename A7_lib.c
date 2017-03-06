@@ -174,6 +174,7 @@ char device_string3[]= "AT+CGMI\r\n";
 char device_string4[]= "ATE0\r\n";
 
 
+
 restart:
 
     RS232_cputs(A7_commond_cport_nr, device_string1);

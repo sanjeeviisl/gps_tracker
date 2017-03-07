@@ -354,6 +354,7 @@ if(A7DataConnect())
             {
 	         no_data_found = false;
              A7_count =0;
+			 send_count++;
             }
           }
 	if(no_data_found)

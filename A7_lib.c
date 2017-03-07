@@ -216,9 +216,6 @@ exit: printf("\nDEVICE INFO FAILED , MAY BE DEVICE IS POWER OFF !\n");
 
 
 int GPSA7Power(int ON) {
-
-
-
 char gps_power_string1[]= "AT+GPS=1\r\n";
 char gps_power_string2[]= "AT+GPS=0\r\n";
 if(ON)
@@ -236,15 +233,7 @@ if(ON)
 		A7_GPSPowerON = true;
 		}
 	else{
-		
-	    RS232_cputs(A7_commond_cport_nr, gps_power_string1);
-   		sleep(2);
-	    Resetbufer(A7_buf,sizeof(A7_buf));
-	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-	        goto exit;
-   		sleep(2);
-		printf("GPS POWER ON SUCCESS\n");
+		printf("ALREADY GPS POWER ON SUCCESS\n");
 		A7_GPSPowerON = true;
 		}
 }
@@ -262,9 +251,10 @@ else
 }
 
 
-SUCCESS: //printf("GPS POWER SUCCESS\n");
+SUCCESS: printf("GPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED\n");
+	A7_GPSPowerON = false;
 return(0);
 
 	
@@ -295,7 +285,6 @@ if(ON)
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
-	sleep(1);
 	printf("NIMEA DATA STARTED\n");
 }
 else

@@ -26,6 +26,7 @@ int A7_GPSPowerON = false;
 int A7_httpInitialize = false;
 int A7_dataConnected = false;
 
+
 extern char * A7_latitude_str;
 extern char * A7_longitude_str;
 extern char  A7_updated_time_str[6];

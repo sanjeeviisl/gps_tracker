@@ -415,7 +415,7 @@ int A7DataConnect() {
 	SUCCESS: printf("DATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
-			A7_dataConnected = false;
+		A7_dataConnected = false;
 	if(n < 2)
 		goto restart;
 	else

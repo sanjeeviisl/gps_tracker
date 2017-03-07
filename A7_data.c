@@ -35,6 +35,16 @@ unsigned char buff;
 unsigned char buffer[10250];
 int  n = 0;
 
+
+retry2:
+	if(!GPSA7Power(1))
+	{
+		printf("\n GPS is power ON failed !!!");
+		goto retry2;
+	}
+     sleep(10);
+
+
 //sleep(10);
 if(!GPSA7NIMEAData(1))
 	{

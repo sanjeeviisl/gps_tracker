@@ -61,32 +61,37 @@ int resetSoftA7GSMModule(){
 int resetHardA7GSMModule() {
 
     char gsm_power_soft_reset[]= "AT+RST=1\r\n";
-	
-	A7_GPSPowerON = false;
-	A7_httpInitialize = false;
-	A7_dataConnected = false;
 
 restart:
     printf("going to reset the A7 GSM Module... ");
 	RS232_cputs(A7_commond_cport_nr, gsm_power_soft_reset);
 	Resetbufer(A7_buf,sizeof(A7_buf));
 	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	sleep(45);
+	sleep(15);
+	// Check if "OK" string is present in the received data 
+	if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+		goto exit;
 
+exit:
+retry1:
+	if(!A7DataConnect())
+	 {
+	   printf("\n GPSRS Data is not connected !!!");
+	   sleep(5);
+	   goto restart;
+    }
+	else
+		printf("\n GPSRS Data is connected !!!");
 
 retry2:
 	if(!GPSA7Power(1))
 	{
 		printf("\n GPS is power ON failed !!!");
-		//goto retry2;
+		goto retry2;
 
 	}
 	else
-		{
 		printf("\n GPS is enabled!!!");
-		return 1;
-		}
-	return 0;
 
 	
 }
@@ -116,11 +121,12 @@ int resetHardA7GPSModule(int n) {
 
 
 			RS232_cputs(A7_commond_cport_nr, gps_power_on);
+			sleep(20);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,5000000);
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				goto exit;
-			sleep(40);
+			sleep(20);
 
 	SUCCESS: printf("\nGPS RESET SUCCESS\n");
 	return(1);
@@ -166,7 +172,6 @@ char device_string1[]= "AT\r\n";
 char device_string2[]= "AT+CGMM\r\n";
 char device_string3[]= "AT+CGMI\r\n";
 char device_string4[]= "ATE0\r\n";
-
 
 
 restart:
@@ -415,8 +420,7 @@ int A7DataConnect() {
 	SUCCESS: printf("DATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
-			A7_dataConnected = false;
-	if(n < 2)
+	if(n < 3)
 		goto restart;
 	else
 		return(0);

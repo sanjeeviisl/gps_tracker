@@ -19,7 +19,7 @@
 
 int send_count = 0;
 
-static int charToInt(char c);
+static int  charToInt(char c);
 double trunc(double d);
 
 

@@ -1,5 +1,6 @@
 
 
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -18,7 +19,7 @@
 
 int send_count = 0;
 
-static int charToInt(char c);
+static int  charToInt(char c);
 double trunc(double d);
 
 
@@ -353,6 +354,7 @@ if(A7DataConnect())
             {
 	         no_data_found = false;
              A7_count =0;
+			 send_count++;
             }
           }
 	if(no_data_found)

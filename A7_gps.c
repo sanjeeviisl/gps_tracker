@@ -142,6 +142,33 @@ void parseDataA7GPS(void){
         gps.UTCHour = charToInt(gps.words[1][0]) * 10 + charToInt(gps.words[1][1]);
         gps.UTCMin = charToInt(gps.words[1][2]) * 10 + charToInt(gps.words[1][3]);
         gps.UTCSec = charToInt(gps.words[1][4]) * 10 + charToInt(gps.words[1][5]);
+
+
+		gps.UTCMin = gps.UTCMin+30;
+		if(gps.UTCMin > 59)
+			{
+			gps.UTCMin = gps.UTCMin-60;
+			gps.UTCHour = gps.UTCHour+5+1;
+			}
+		else
+			{
+			gps.UTCHour = gps.UTCHour+5;
+			}
+
+		if(gps.UTCHour > 23)
+			gps.UTCHour = 0;
+			
+
+
+		gps.words[1][0] =(int) gps.UTCHour /10 + '0';
+		gps.words[1][1] =(int) gps.UTCHour % 10 + '0';
+
+		gps.words[1][2] =(int) gps.UTCMin /10 + '0';
+		gps.words[1][3] =(int) gps.UTCMin % 10 + '0';
+
+		gps.words[1][4] =(int) gps.UTCSec /10 + '0';
+		gps.words[1][5] =(int) gps.UTCSec % 10 + '0';
+		
         // parse latitude and longitude in NMEA format
         gps.latitude = strtof(gps.words[2], NULL);
         gps.longitude = strtof(gps.words[4], NULL);
@@ -390,7 +417,8 @@ if(A7DataConnect())
 		{
 		A7DataDisconnect();
 		sleep(1);
-		A7DataConnect();
+		A7DataConn
+			?ect();
 		send_count = 0;
 		}
 	}		

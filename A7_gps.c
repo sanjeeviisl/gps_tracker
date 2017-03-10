@@ -417,8 +417,7 @@ if(A7DataConnect())
 		{
 		A7DataDisconnect();
 		sleep(1);
-		A7DataConn
-			?ect();
+		A7DataConnect();
 		send_count = 0;
 		}
 	}		

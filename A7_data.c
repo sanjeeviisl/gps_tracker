@@ -24,7 +24,7 @@
 #define true 1
 #define false 0
 
-int write_position;
+int n,write_position;
 unsigned char gps_data_buffer[22400];
 
 int receiveA7GPSData() ;
@@ -65,7 +65,7 @@ while (true) {
   
   if(buff == '$') count++;
   if(count > 300) break;
-  gps_data_buffer[write_position++];
+  gps_data_buffer[write_position++] = buff;
   //printf("%c", buff);
 }
 

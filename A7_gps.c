@@ -1,5 +1,6 @@
 
 
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -10,7 +11,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "sim808_lib.h"
+#include "A7_lib.h"
 #include "rs232.h"
 
 #define true 1
@@ -18,7 +19,7 @@
 
 int send_count = 0;
 
-static int charToInt(char c);
+static int  charToInt(char c);
 double trunc(double d);
 
 
@@ -85,12 +86,6 @@ char t_buffer4[10];
 char t_buffer5[10];
 
 
-static char *dtostrf (double val, signed char width, unsigned char prec, char *sout) { 
-   char fmt[20]; 
-   sprintf(fmt, "%%%d.%df", width, prec); 
-   sprintf(sout, fmt, val); 
-   return sout; 
-} 
 
 
 void parseDataA7GPS(void){
@@ -141,6 +136,33 @@ void parseDataA7GPS(void){
         gps.UTCHour = charToInt(gps.words[1][0]) * 10 + charToInt(gps.words[1][1]);
         gps.UTCMin = charToInt(gps.words[1][2]) * 10 + charToInt(gps.words[1][3]);
         gps.UTCSec = charToInt(gps.words[1][4]) * 10 + charToInt(gps.words[1][5]);
+
+
+		gps.UTCMin = gps.UTCMin+30;
+		if(gps.UTCMin > 59)
+			{
+			gps.UTCMin = gps.UTCMin-60;
+			gps.UTCHour = gps.UTCHour+5+1;
+			}
+		else
+			{
+			gps.UTCHour = gps.UTCHour+5;
+			}
+
+		if(gps.UTCHour > 23)
+			gps.UTCHour = 0;
+			
+
+
+		gps.words[1][0] =(int) gps.UTCHour /10 + '0';
+		gps.words[1][1] =(int) gps.UTCHour % 10 + '0';
+
+		gps.words[1][2] =(int) gps.UTCMin /10 + '0';
+		gps.words[1][3] =(int) gps.UTCMin % 10 + '0';
+
+		gps.words[1][4] =(int) gps.UTCSec /10 + '0';
+		gps.words[1][5] =(int) gps.UTCSec % 10 + '0';
+		
         // parse latitude and longitude in NMEA format
         gps.latitude = strtof(gps.words[2], NULL);
         gps.longitude = strtof(gps.words[4], NULL);
@@ -322,29 +344,45 @@ static char* read_file (const char* filename, size_t* length)
 }
 
 
+
+static char* read_from_buffer (size_t* length)
+{
+  *length = write_position;
+  return gps_data_buffer;
+}
+
+
+
 static void release_file (char* buffer)
 {
 free(buffer);
-snprintf(move_file_name,sizeof(move_file_name),"%s%s%s", "rm ", " ",A7_logFileName);
+//snprintf(move_file_name,sizeof(move_file_name),"%s%s%s", "rm ", " ",A7_logFileName);
 system(move_file_name);
 }
 
+static void release_buffer (char* buffer)
+{
+Resetbufer(buffer,write_position);
+write_position = 0;
+
+}
 
 
 int sendA7GPSData() {
 int i; 
 size_t size;
 char ch;
-char *string;
+unsigned char *string;
 int no_data_found;
 
 no_data_found =true;
+size = 0;
 
 if(A7DataConnect())
 	{
-	printf("sending data to web server from file %s \n",A7_logFileName);
-    string = read_file(A7_logFileName,&size); //check data
-    if( string != NULL) 
+	printf("sending data to web server from buffer\n");
+	string = read_from_buffer(&size); //check data
+    if( size > 0) 
         for(i= 0 ; i < size ;i++)
           {
           ch = string[i];
@@ -353,11 +391,12 @@ if(A7DataConnect())
             {
 	         no_data_found = false;
              A7_count =0;
+			 send_count++;
             }
           }
 	if(no_data_found)
 		{
-		printf("\n No Data Found sending Status to web server from file %s \n",A7_logFileName);
+		printf("\n No Data Found sending Status to web server from buffer\n");
 		if(sendA7StatusToTCPServer(1)){
 			 	printf("send status Ok!\n");
 				resetHardA7GPSModule(1);
@@ -370,20 +409,8 @@ if(A7DataConnect())
 		   goto exit;
 		   }
 		}
-	else
-		{	
-		 //printf("Moving File to New Name!\n");
-                 //sleep(5);
-		 //strcpy(A7_newFileName,A7_updated_time_str);
-		 //strcat(A7_newFileName,A7_updated_date_str);
-		 //strcat(A7_newFileName,A7_logFileName);
-		 //snprintf(move_file_name,sizeof(move_file_name),"%s%s%s%s%s", "mv  ", " ",A7_logFileName , " ",A7_newFileName);
-		 //system(move_file_name);
 
-		}
-		
-	release_file(string);
-	string = NULL;
+	release_buffer(string);	
 	if(send_count > 20)
 		{
 		A7DataDisconnect();

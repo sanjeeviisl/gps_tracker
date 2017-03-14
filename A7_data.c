@@ -24,16 +24,30 @@
 #define true 1
 #define false 0
 
-int receiveA7GPSData() ;
+int write_position;
+unsigned char gps_data_buffer[22400];
 
-FILE *file;
-char A7_logFileName[]="A7_gpslog.txt";
+int receiveA7GPSData() ;
 
 int receiveA7GPSData() {
 int count = 0 ;
 unsigned char buff;
 unsigned char buffer[10250];
+
+
 int  n = 0;
+
+n = 0;
+write_position = 0;
+
+retry2:
+	if(!GPSA7Power(1))
+	{
+		printf("\n GPS is power ON failed !!!");
+		goto retry2;
+	}
+     sleep(10);
+
 
 //sleep(10);
 if(!GPSA7NIMEAData(1))
@@ -41,10 +55,6 @@ if(!GPSA7NIMEAData(1))
 		printf("\n GPS is NIMEA DATA failed !!!");
 		return 0;
 	}
-
-file = fopen(A7_logFileName ,"w+" );
-if(file == NULL)
-    return 0;
 
 while (true) { 
   n = RS232_PollComport(A7_data_cport_nr,&buff,1 );
@@ -57,13 +67,13 @@ while (true) {
   
   if(buff == '$') count++;
   if(count > 300) break;
-  fputc(buff, file);
+  gps_data_buffer[write_position++];
   //printf("%c", buff);
-  }
+}
 
 
 quit:
-   fclose (file);
+
    GPSA7NIMEAData(0);
    RS232_PollComport(A7_data_cport_nr,buffer,10240 );
    ClearCOMPortData();

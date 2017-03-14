@@ -26,6 +26,7 @@ int A7_GPSPowerON = false;
 int A7_httpInitialize = false;
 int A7_dataConnected = false;
 
+
 extern char * A7_latitude_str;
 extern char * A7_longitude_str;
 extern char  A7_updated_time_str[6];
@@ -49,6 +50,88 @@ const unsigned char A7_Token[]={">"};
 unsigned char A7_buf[6000];
 int A7_buf_SIZE=sizeof(A7_buf);
 
+
+static unsigned char * MapForward (unsigned char *pMapData, unsigned short   MapDataLength,
+unsigned char *pMapPoints, unsigned short   MapPointsLength )
+{
+    unsigned short DataIndex;
+    unsigned short MapPointIndex;
+
+    for(DataIndex = 0; DataIndex < MapDataLength - MapPointsLength + 1; DataIndex++)
+    {
+        for(MapPointIndex = 0; MapPointIndex < MapPointsLength; MapPointIndex++)
+        {
+            if( pMapData[DataIndex + MapPointIndex] != pMapPoints[MapPointIndex])
+            {
+                goto PICK_NEXT_FMAPDATA;
+            }
+        }
+        return(& pMapData[DataIndex]);
+    PICK_NEXT_FMAPDATA:;
+   }
+    return(NULL);
+}
+
+static unsigned char * MapForwardReturn
+(
+        unsigned char *pMapData,
+        unsigned short   MapDataLength,
+        unsigned char *pMapPoints,
+        unsigned short   MapPointsLength
+)
+{
+    unsigned short DataIndex;
+    unsigned short MapPointIndex;
+    for(DataIndex = 0; DataIndex < MapDataLength - MapPointsLength + 1; DataIndex++)
+    {
+        for(MapPointIndex = 0; MapPointIndex < MapPointsLength; MapPointIndex++)
+        {
+            if( pMapData[DataIndex + MapPointIndex] != pMapPoints[MapPointIndex])
+            {   
+                goto PICK_NEXT_FMAPDATA;
+            }
+        }
+        return(& pMapData[DataIndex]);
+    PICK_NEXT_FMAPDATA:;
+    }
+    return(NULL);
+}
+
+static int ReadComport(int cport_nr,unsigned char *buf,int size,useconds_t count) //size=6000
+{
+  int n=0;
+  usleep(count);
+  while(1)
+  {
+    n = RS232_PollComport(cport_nr, buf, size);
+    if(n > 0)
+    {
+      buf[n] = 0;   /* always put a "null" at the end of a string! */
+      printf("%s\n", (char *)buf);
+      break;
+    }
+   }
+  return n;
+}
+
+
+char *dtostrf (double val, signed char width, unsigned char prec, char *sout) { 
+   char fmt[20]; 
+   sprintf(fmt, "%%%d.%df", width, prec); 
+   sprintf(sout, fmt, val); 
+   return sout; 
+} 
+
+void Resetbufer(unsigned char *buf,int size)
+{
+        int i;
+        for(i=0;i<size;i++)
+        {
+                buf[i] = '0';
+        }
+}
+
+
 int resetSoftA7GSMModule(){
     char gsm_power_soft_reset[]= "AT+RST=1\r\n";
 
@@ -61,37 +144,32 @@ int resetSoftA7GSMModule(){
 int resetHardA7GSMModule() {
 
     char gsm_power_soft_reset[]= "AT+RST=1\r\n";
+	
+	A7_GPSPowerON = false;
+	A7_httpInitialize = false;
+	A7_dataConnected = false;
 
 restart:
     printf("going to reset the A7 GSM Module... ");
 	RS232_cputs(A7_commond_cport_nr, gsm_power_soft_reset);
 	Resetbufer(A7_buf,sizeof(A7_buf));
 	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	sleep(15);
-	// Check if "OK" string is present in the received data 
-	if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-		goto exit;
+	sleep(45);
 
-exit:
-retry1:
-	if(!A7DataConnect())
-	 {
-	   printf("\n GPSRS Data is not connected !!!");
-	   sleep(5);
-	   goto restart;
-    }
-	else
-		printf("\n GPSRS Data is connected !!!");
 
 retry2:
 	if(!GPSA7Power(1))
 	{
 		printf("\n GPS is power ON failed !!!");
-		goto retry2;
+		//goto retry2;
 
 	}
 	else
+		{
 		printf("\n GPS is enabled!!!");
+		return 1;
+		}
+	return 0;
 
 	
 }
@@ -121,12 +199,11 @@ int resetHardA7GPSModule(int n) {
 
 
 			RS232_cputs(A7_commond_cport_nr, gps_power_on);
-			sleep(20);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,5000000);
 			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				goto exit;
-			sleep(20);
+			sleep(40);
 
 	SUCCESS: printf("\nGPS RESET SUCCESS\n");
 	return(1);
@@ -221,9 +298,6 @@ exit: printf("\nDEVICE INFO FAILED , MAY BE DEVICE IS POWER OFF !\n");
 
 
 int GPSA7Power(int ON) {
-
-
-
 char gps_power_string1[]= "AT+GPS=1\r\n";
 char gps_power_string2[]= "AT+GPS=0\r\n";
 if(ON)
@@ -241,15 +315,7 @@ if(ON)
 		A7_GPSPowerON = true;
 		}
 	else{
-		
-	    RS232_cputs(A7_commond_cport_nr, gps_power_string1);
-   		sleep(2);
-	    Resetbufer(A7_buf,sizeof(A7_buf));
-	    ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-	        goto exit;
-   		sleep(2);
-		printf("GPS POWER ON SUCCESS\n");
+		printf("ALREADY GPS POWER ON SUCCESS\n");
 		A7_GPSPowerON = true;
 		}
 }
@@ -267,9 +333,10 @@ else
 }
 
 
-SUCCESS: //printf("GPS POWER SUCCESS\n");
+SUCCESS: printf("GPS POWER SUCCESS\n");
 return(1);
 exit: printf("\nGPS POWER FAILED\n");
+	A7_GPSPowerON = false;
 return(0);
 
 	
@@ -300,7 +367,6 @@ if(ON)
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
     if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
         goto exit;
-	sleep(1);
 	printf("NIMEA DATA STARTED\n");
 }
 else
@@ -421,7 +487,8 @@ int A7DataConnect() {
 	SUCCESS: printf("DATA CONNECT SUCCESS \n");
 	return(1);
 	exit: printf("DATA CONNECT FAILED \n ");
-	if(n < 3)
+		A7_dataConnected = false;
+	if(n < 2)
 		goto restart;
 	else
 		return(0);
@@ -568,8 +635,8 @@ int sendA7StatusToTCPServer(int testData)
 	
 	
 	tcp_string_end[0] = end_of_file_byte;
-			Resetbufer(send_string,1024);	
-		strcpy(A7_device_id_str,"1234567890");
+	Resetbufer(send_string,1024);	
+	strcpy(A7_device_id_str,"1234567890");
 	if(testData)
 		{
 		//test data should be comment after real data

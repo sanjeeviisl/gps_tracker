@@ -19,6 +19,10 @@ sem_t filling_list;             /* to protect threads_fill_done */
 
 extern int sendA7GPSData() ;
 extern int receiveA7GPSData() ;
+extern int A7_GPSPowerON ;
+extern int A7_httpInitialize;
+extern int A7_dataConnected ;
+
 
 
 void* gpsA7DataReceiverTask(void *arg)
@@ -37,8 +41,10 @@ void* gpsA7DataReceiverTask(void *arg)
 		 restart:
 		  if(!receiveA7GPSData())
 			 {
+			 i++;
 			 printf("\n ReceiveData Not OK, so resetting the module");
 			 startRecoveryForA7ReceiveDataFailed(0);
+			 sleep(1*i);
 			 goto restart;
 			 }
 			  
@@ -70,9 +76,9 @@ void* gpsA7DataSenderTask(void *arg)
       if(!sendA7GPSData())
 		   {
 		   printf("\n Send Data Not OK");
-		   resetHardA7GSMModule();
-		   pthread_mutex_unlock(&lock);
-		   sem_post(&filling_list);
+		   startRecoveryForA7SendDataFailed(1);
+//		   pthread_mutex_unlock(&lock);
+//		   sem_post(&filling_list);
   	   		}
     }
         
@@ -91,6 +97,8 @@ int A7_main()
     if(!openA7Port())
 	{
          printf("\n Comport is not initialized\n");
+
+		sleep(600);
          return 0;
 	}
 
@@ -100,16 +108,11 @@ int A7_main()
          return 0;
 	}
 
-	sleep(10);
+	
+	A7_GPSPowerON = 0;
+	A7_httpInitialize = 0;
+	A7_dataConnected = 0;
 
-
-retry2:
-	if(!GPSA7Power(1))
-	{
-		printf("\n GPS is power ON failed !!!");
-		goto retry2;
-	}
-     sleep(10);
     res = sem_init(&done_filling_list,  /* pointer to semaphore */
                        0 ,              /* 0 if shared between threads, 1 if shared between processes */
                        0);              /* initial value for semaphore (0 is locked) */

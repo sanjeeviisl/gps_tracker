@@ -35,8 +35,6 @@ unsigned char buff;
 unsigned char buffer[10250];
 
 
-int  n = 0;
-
 n = 0;
 write_position = 0;
 

@@ -1,0 +1,25 @@
+#! /bin/sh
+# /etc/init.d/vehicle_tracker
+#
+
+# Some things that run always
+touch /var/lock/vehicle_tracker
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting application vehicle_tracker "
+    vehicle_tracker.out
+    ;;
+  stop)
+    echo "Stopping vehicle_tracker application"
+    killall vehicle_tracker.out
+    ;;
+  *)
+    echo "Usage: /etc/init.d/vehicle_tracker {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0
+

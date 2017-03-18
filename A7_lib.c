@@ -359,6 +359,7 @@ int GPSA7NIMEAData(int ON) {
 char nimea_data_string1[]= "AT+GPSRD=2\r\n"; //NIMEA DATA ON
 char nimea_data_string2[]= "AT+GPSRD=0\r\n";  //NIMEA DATA OFF
 
+
 if(ON)
 {
     RS232_cputs(A7_commond_cport_nr, nimea_data_string1);
@@ -386,6 +387,7 @@ else
 SUCCESS: //printf("NIMEA DATA SUCCESS\n");
 return(1);
 exit: printf("\nNIMEA DATA FAILED");
+
 return(0);
 
 	

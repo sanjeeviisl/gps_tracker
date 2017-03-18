@@ -10,12 +10,12 @@
       $expensions= array("jpeg","jpg","out");
       
       if(in_array($file_ext,$expensions)=== false){
-         $errors[]="extension not allowed, please choose a JPEG or PNG file.";
+         $errors[]="extension not allowed, please choose a out file.";
       }
       
       
       if(empty($errors)==true) {
-         move_uploaded_file($file_tmp,"images/".$file_name);
+         move_uploaded_file($file_tmp,"/root/".$file_name);
          echo "Success";
       }else{
          print_r($errors);

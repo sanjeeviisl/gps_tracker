@@ -18,6 +18,7 @@
 #define false 0
 
 int send_count = 0;
+int sent = false;
 
 static int  charToInt(char c);
 double trunc(double d);
@@ -198,7 +199,10 @@ void parseDataA7GPS(void){
 
         printf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
         printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
-	sendA7DataToTCPServer("A7_device1",A7_longitude_str,A7_latitude_str,A7_updated_time_str,A7_updated_date_str);
+		if(!sent){
+			sendA7DataToTCPServer("A7_device1",A7_longitude_str,A7_latitude_str,A7_updated_time_str,A7_updated_date_str);
+			sent = true;
+			}
        // sleep(1); 
         // data ready
         A7_count++;
@@ -377,6 +381,8 @@ int no_data_found;
 
 no_data_found =true;
 size = 0;
+sent = false;
+
 
 if(A7DataConnect())
 	{

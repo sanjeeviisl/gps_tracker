@@ -93,7 +93,7 @@ int A7_main()
 {
     int i,s = 0;
     int err,res;
-    sleep(10);
+    //sleep(10);
     if(!openA7Port())
 	{
          printf("\n Comport is not initialized\n");

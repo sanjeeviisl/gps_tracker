@@ -6,7 +6,7 @@ extern int A7_commond_cport_nr;
 extern int A7_data_cport_nr;
 
 extern unsigned char gps_data_buffer[];
-extern int write_position;
+extern int write_position,readComplete;
 
 extern int openA7Port() ;
 extern int sendA7DataToServer();

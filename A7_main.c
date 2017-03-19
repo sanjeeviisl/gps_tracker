@@ -113,6 +113,9 @@ int A7_main()
 	A7_GPSPowerON = 0;
 	A7_httpInitialize = 0;
 	A7_dataConnected = 0;
+	GPSA7Power(0);
+	GPSA7NIMEAData(0);
+	
 
     res = sem_init(&done_filling_list,  /* pointer to semaphore */
                        0 ,              /* 0 if shared between threads, 1 if shared between processes */

@@ -416,11 +416,10 @@ if(A7DataConnect())
 		   }
 		}
 
-	release_buffer(string);	
-	if(send_count > 20)
+	if(send_count > 5)
 		{
 		A7DataDisconnect();
-		sleep(1);
+		//sleep(1);
 		A7DataConnect();
 		send_count = 0;
 		}
@@ -432,10 +431,14 @@ else
 
 
 SUCCESS: printf("sendGPSData SUCCESS \n");
+       	release_buffer(string);	
 		send_count++;
 
 return(1);
 exit: printf("\n sendGPSData FAILED\ n");
+		release_buffer(string); 
+		send_count++;
+
 return(0);
 
 }

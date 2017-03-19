@@ -167,6 +167,9 @@ retry2:
 	else
 		{
 		printf("\n GPS is enabled!!!");
+		
+		GPSA7NIMEAData(1);
+		sleep(1);
 		return 1;
 		}
 	return 0;
@@ -194,16 +197,18 @@ int resetHardA7GPSModule(int n) {
 			sleep(1);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-				goto exit;
+			//if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+				//goto exit;
 
 
 			RS232_cputs(A7_commond_cport_nr, gps_power_on);
 			Resetbufer(A7_buf,sizeof(A7_buf));
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,5000000);
-			if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-				goto exit;
+			//if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+				//goto exit;
 			sleep(40);
+			GPSA7NIMEAData(1);
+			sleep(1);
 
 	SUCCESS: printf("\nGPS RESET SUCCESS\n");
 	return(1);

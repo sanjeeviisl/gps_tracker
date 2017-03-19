@@ -27,12 +27,6 @@ int A7_httpInitialize = false;
 int A7_dataConnected = false;
 
 
-extern char * A7_latitude_str;
-extern char * A7_longitude_str;
-extern char  A7_updated_time_str[6];
-extern char  A7_updated_date_str[8];
-
-
 int A7_commond_cport_nr=1,    /* /dev/ttyS1 */
     A7_commond_bdrate=115200; /* 115200 baud */
 char A7_commond_mode[]={'8','N','1',0},str[512];
@@ -618,7 +612,14 @@ snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_
 int sendA7StatusToTCPServer(int testData)
 	{
 	
+	
+	char * A7_latitude_str;
+	char * A7_longitude_str;
+	char  A7_updated_time_str[7];
+	char  A7_updated_date_str[7];
+	
 	char send_string[ 1024 ];
+	
 	
 	char tcp_string1[]= "at+cipstatus\r\n";
 	char tcp_string2[]= "AT+CIPSTART=\"TCP\",\"www.iisl.co.in\",80\r\n";
@@ -649,10 +650,10 @@ int sendA7StatusToTCPServer(int testData)
 		//test data should be comment after real data
 		A7_longitude_str=dtostrf(88.8888888,0,6,t_buffer11);
 		A7_latitude_str=dtostrf(88.8888888,0,6,t_buffer22);
-		strncpy(A7_updated_date_str,"31012017",8);
+		strncpy(A7_updated_date_str,"310117",6);
 		strncpy(A7_updated_time_str,"101010",6);
 		A7_updated_time_str[7]= 0;
-		A7_updated_date_str[9] =0 ;
+		A7_updated_date_str[7] =0 ;
 		}
 	
 	restart:

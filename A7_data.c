@@ -45,7 +45,7 @@ int A7_count =0;
 char * A7_latitude_str;
 char * A7_longitude_str;
 char A7_updated_time_str[7];
-char A7_updated_date_str[7]="010117";
+char A7_updated_date_str[7];
 char t_buffer111[10];
 char t_buffer222[10];
 
@@ -119,9 +119,9 @@ while (true) {
 	  
 	  if(count > 120) {	  
 	  		gps_data_buffer[write_position] = 0;   
+			//resetAllData();
 			parseNimeaData(gps_data_buffer, write_position);
-			write_position = 0;
-			Resetbufer(gps_data_buffer,10250);
+			
 	  	}
 
 	  if(buff == '$') count++;
@@ -132,6 +132,20 @@ while (true) {
    return 1;
 }
 
+
+void resetAllData(){
+	write_position = 0;
+	Resetbufer(gps_data_buffer,10250);
+	A7_longitude_str=dtostrf(88.8888888,0,6,t_buffer111);
+	A7_latitude_str=dtostrf(88.8888888,0,6,t_buffer222);
+	strncpy(A7_updated_date_str,"310117",6);
+	strncpy(A7_updated_time_str,"101010",6);
+	A7_updated_time_str[7]= 0;
+	A7_updated_date_str[7] =0 ;
+
+
+}
+	
 
 unsigned char * get_A7_longitude_str(){
 	if(no_data_found)

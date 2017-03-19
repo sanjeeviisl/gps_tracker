@@ -51,8 +51,9 @@ void* gpsA7DataReceiverTask(void *arg)
 	         
     }
 
-    pthread_mutex_unlock(&lock);
-    sem_post(&done_filling_list);
+
+   // pthread_mutex_unlock(&lock);
+   // sem_post(&done_filling_list);
 
     }
 

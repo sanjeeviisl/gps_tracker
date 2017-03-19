@@ -366,8 +366,8 @@ if(ON)
 	sleep(1);
     Resetbufer(A7_buf,sizeof(A7_buf));
     ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-    if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
-        goto exit;
+   // if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
+     //   goto exit;
 	printf("NIMEA DATA STARTED\n");
 }
 else

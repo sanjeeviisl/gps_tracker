@@ -95,7 +95,7 @@ quit:
 //  RS232_PollComport(A7_data_cport_nr,buffer,10240 );
 //  ClearCOMPortData();
    printf("receiveA7GPSData SUCCESS \n");
-   sleep(1);
+ //  sleep(1);
    return 1;
 
    

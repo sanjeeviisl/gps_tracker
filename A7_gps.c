@@ -35,6 +35,11 @@ int no_data_found;
 no_data_found =getDataStatus();
 
 
+//Test
+no_data_found = 1;
+
+
+
 if(A7DataConnect())
 	{
 	printf("sending data to web server from buffer\n");

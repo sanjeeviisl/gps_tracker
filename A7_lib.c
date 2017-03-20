@@ -564,13 +564,14 @@ restart:
 			//if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_Token,2) == NULL)
 				//goto exit;
 
-snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",device_id,"&latitude=",latitude,"&longitude=",longitude,"&utcdate_stamp=",updated_date,"&utctime_stamp=",updated_time,tcp_body_str);
+			snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",device_id,"&latitude=",latitude,"&longitude=",longitude,"&utcdate_stamp=",updated_date,"&utctime_stamp=",updated_time,tcp_body_str);
 	
 			RS232_cputs(A7_commond_cport_nr, send_string);
 
 			RS232_cputs(A7_commond_cport_nr, tcp_footer_str);
 
 		    RS232_cputs(A7_commond_cport_nr, tcp_string_end);
+
 			RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
 
 			sleep(5);			
@@ -656,7 +657,8 @@ int sendA7StatusToTCPServer(int testData)
 		A7_updated_date_str[7] =0 ;
 		}
 	
-	restart:
+
+				Resetbufer(send_string,1024);
 	
 				RS232_cputs(A7_commond_cport_nr, tcp_string1);
 				sleep(1);
@@ -689,20 +691,15 @@ int sendA7StatusToTCPServer(int testData)
 				// Check if ">" string is present in the received data 
 				//if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_Token,2) == NULL)
 					//goto exit;
-	
-	
-	//snprintf(send_string,sizeof(send_string), "%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&","latitude=",A7_latitude_str,"&" , "longitude=",A7_longitude_str,tcp_body_str);
-			
-snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&latitude=",A7_latitude_str,"&longitude=",A7_longitude_str,"&utcdate_stamp=",A7_updated_time_str,"&utctime_stamp=",A7_updated_time_str,tcp_body_str);
+				
+				snprintf(send_string,sizeof(send_string),"%s%s%s%s%s%s%s%s%s%s%s%s", tcp_header_str,"device_id=",A7_device_id_str,"&latitude=",A7_latitude_str,"&longitude=",A7_longitude_str,"&utcdate_stamp=",A7_updated_time_str,"&utctime_stamp=",A7_updated_time_str,tcp_body_str);
 	
 				RS232_cputs(A7_commond_cport_nr, send_string);
-	//			RS232_cputs(A7_commond_cport_nr, send_string1);
 				RS232_cputs(A7_commond_cport_nr, tcp_footer_str);
-	
 				RS232_cputs(A7_commond_cport_nr, tcp_string_end);
 				RS232_cputs(A7_commond_cport_nr, tcp_string_end1);
 				sleep(5);		
-			Resetbufer(send_string,1024);	
+				
 				Resetbufer(A7_buf,sizeof(A7_buf));
 				ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 				// Check if "OK" string is present in the received data 

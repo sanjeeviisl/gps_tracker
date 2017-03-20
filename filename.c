@@ -7,7 +7,7 @@ char logFileName[]= "A7_gpslog.txt";
 
 char A7_newFileName[26];
 char A7_updated_time_str[6];
-char A7_updated_date_str[8];
+char A7_updated_date_str[6];
 
 
 int main()

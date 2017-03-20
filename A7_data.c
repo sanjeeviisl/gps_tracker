@@ -45,7 +45,7 @@ int A7_count =0;
 char * A7_latitude_str;
 char * A7_longitude_str;
 char A7_updated_time_str[7];
-char A7_updated_date_str[7];
+char A7_updated_date_str[9];
 char t_buffer111[10];
 char t_buffer222[10];
 
@@ -149,7 +149,7 @@ void resetAllData(){
 
 unsigned char * get_A7_longitude_str(){
 	if(no_data_found)
-		return dtostrf(88.8888888,0,6,t_buffer111);
+		return "no_Data";
 	else
 		return A7_longitude_str;
 		
@@ -157,7 +157,7 @@ unsigned char * get_A7_longitude_str(){
 
 unsigned char * get_A7_latitude_str(){
 	if(no_data_found)
-		return dtostrf(88.8888888,0,6,t_buffer222);
+		return "no_Data";
 	else
 		return A7_latitude_str;
 		
@@ -167,8 +167,7 @@ unsigned char * get_A7_latitude_str(){
 unsigned char * get_A7_updated_date_str(){
 	if(no_data_found)
 		{
-		strncpy(A7_updated_date_str,"310117",6);
-		A7_updated_date_str[7] =0 ;
+		return "no_Data";
 		}
 	return A7_updated_date_str;
 		
@@ -177,8 +176,7 @@ unsigned char * get_A7_updated_date_str(){
 unsigned char * get_A7_updated_time_str(){
 	if(no_data_found)
 		{
-		strncpy(A7_updated_time_str,"101010",6);
-		A7_updated_time_str[7]= 0;
+		return "no_Data";
 		}
 	return A7_updated_time_str;
 		
@@ -359,7 +357,7 @@ void parseDataA7GPS(void){
         gps.dataValid = true;
 
         gps.speed = strtof(gps.words[7], NULL);
-        gps.speed *= 1.15078; // convert to mph
+//        gps.speed *= 1.15078; // convert to mph
         // parse bearing
         gps.bearing = strtof(gps.words[8], NULL);
 

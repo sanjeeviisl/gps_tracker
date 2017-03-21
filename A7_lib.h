@@ -35,6 +35,8 @@ struct gpsStruct {//GPRMC
     float   altitude;	// GPGGA
     float   speed;		// GPRMC
     float   bearing;	// GPRMC
+    char    time[7];
+	char    date[7];
 
 
 };

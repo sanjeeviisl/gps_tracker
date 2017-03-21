@@ -55,6 +55,8 @@ const unsigned char A7_Token[]={">"};
 unsigned char A7_buf[6000];
 int A7_buf_SIZE=sizeof(A7_buf);
 
+char  A7_updated_time_str[7];
+char  A7_updated_date_str[7];
 
 static unsigned char * MapForward (unsigned char *pMapData, unsigned short   MapDataLength,
 unsigned char *pMapPoints, unsigned short   MapPointsLength )
@@ -627,8 +629,6 @@ int sendA7StatusToTCPServer(int testData)
 	
 	char * A7_latitude_str;
 	char * A7_longitude_str;
-	char  A7_updated_time_str[7];
-	char  A7_updated_date_str[7];
 	
 	char send_string[ 1024 ];
 	
@@ -675,19 +675,22 @@ int sendA7StatusToTCPServer(int testData)
 		//test data should be comment after real data
 		A7_longitude_str=dtostrf(gps.longitude,0,6,t_buffer11);
 		A7_latitude_str=dtostrf(gps.latitude,0,6,t_buffer22);
-		strncpy(A7_updated_time_str,gps.words[1],6);
-		A7_updated_date_str[7] =0 ;
+		//strncpy(A7_updated_time_str,gps.time,6);
+		//A7_updated_time_str[7] =0 ;
 		}
 	
 	if(gps.flagDateReady)
 		{
-		strncpy(A7_updated_date_str,gps.words[9],6);
-		A7_updated_date_str[7] =0 ;
+		//strncpy(A7_updated_date_str,gps.date,6);
+		//A7_updated_date_str[7] =0 ;
 		}
 
 	pthread_mutex_unlock(&lock);
 		
-
+	printf("\n Lat %s Lang %s Time %s Date %s ", A7_longitude_str,A7_latitude_str,gps.time,gps.date);
+	//sleep(10);
+	
+	
 				Resetbufer(send_string,1024);
 	
 				RS232_cputs(A7_commond_cport_nr, tcp_string1);
@@ -757,6 +760,7 @@ int sendA7StatusToTCPServer(int testData)
 		return(1);
 		exit: printf("\n SEND STATUS FAILED\ n");
 		return(0);
+		
 	
 	}
 

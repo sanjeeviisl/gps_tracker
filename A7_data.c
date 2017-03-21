@@ -102,6 +102,8 @@ void parseNimeaData(unsigned char * string, int size) {
 		  parseA7GPSNIMEADATA(ch);
 	}
 	pthread_mutex_unlock(&lock);
+	printf(".");
+	sleep(1);
 }
 
 
@@ -202,7 +204,8 @@ void parseDataA7GPS(void){
 //        A7_latitude_str=dtostrf(gps.latitude,0,6,t_buffer2);
 
 
-//		strncpy(A7_updated_time_str,gps.words[1],6);
+		strncpy(gps.time,gps.words[1],6);
+		gps.time[7]=0;
 		
 //		A7_updated_time_str[7]= 0;
 
@@ -269,6 +272,9 @@ void parseDataA7GPS(void){
         gps.UTCDay = charToInt(gps.words[9][0]) * 10 + charToInt(gps.words[9][1]);
         gps.UTCMonth = charToInt(gps.words[9][2]) * 10 + charToInt(gps.words[9][3]);
         gps.UTCYear = charToInt(gps.words[9][4]) * 10 + charToInt(gps.words[9][5]);
+
+		strncpy(gps.date,gps.words[9],6);
+		gps.date[7]=0;
 		
         //printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
         //printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);

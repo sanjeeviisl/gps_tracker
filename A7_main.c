@@ -35,11 +35,11 @@ void* gpsA7DataReceiverTask(void *arg)
 	GPSA7NIMEAData(1);
 	
 	//pthread_mutex_unlock(&lock);
-	sem_post(&done_filling_list);
+	//sem_post(&done_filling_list);
 
     while(1)
     {
-    sem_wait(&filling_list); // blocks is semaphore 0. If semaphore nonzero,
+    //sem_wait(&filling_list); // blocks is semaphore 0. If semaphore nonzero,
     //pthread_mutex_lock(&lock);  
     if(pthread_equal(id,tid[0]))
     {
@@ -58,7 +58,6 @@ void* gpsA7DataReceiverTask(void *arg)
     }
 
 
-
     }
 
     return NULL;
@@ -69,7 +68,7 @@ void* gpsA7DataSenderTask(void *arg)
     unsigned long i = 0;
     pthread_t id = pthread_self();
 
-    sem_wait(&done_filling_list);    
+    //sem_wait(&done_filling_list);    
 
     //pthread_mutex_lock(&lock);  
 

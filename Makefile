@@ -27,7 +27,7 @@ LFLAGS = -L/home/newhall/lib  -L../lib
 LIBS = -lm -lpthread
 
 # define the C source files
-SRCS = daemon_main.c gpio_lib.c gps_init.c gps_lib.c  \
+SRCS = daemon_main.c gpio_lib.c gps_init.c  \
        rs232.c  A7_main.c A7_lib.c  A7_data.c A7_gps.c
 
 # define the C object files 

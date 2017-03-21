@@ -18,42 +18,27 @@
 #define false 0
 
 int send_count = 0;
+int data_found;
 
-
-//int sent = false;
-
-//static int  charToInt(char c);
-//double trunc(double d);
-
-
-int sendA7GPSData() ;
 
 int sendA7GPSData() {
 
-int no_data_found;
 
-no_data_found =getDataStatus();
+data_found =getDataStatus();
 
-
-//Test
-no_data_found = 1;
-
+send_count++;
 
 
 if(A7DataConnect())
 	{
 	printf("sending data to web server from buffer\n");
 	//
-	if(no_data_found)
+	if(data_found)
 		sendA7StatusToTCPServer(1);
-	else
-		sendA7DataToTCPServer("A7_device1",get_A7_longitude_str(),get_A7_latitude_str(),get_A7_updated_time_str(),get_A7_updated_date_str());
 
 	A7DataDisconnect();
-
 	
 	SUCCESS: printf("sendGPSData SUCCESS \n");
-			send_count++;
 	
 	return(1);
 	}
@@ -61,7 +46,6 @@ if(A7DataConnect())
 	else
 		{
 		exit: printf("\n sendGPSData FAILED\ n");
-		send_count++;
 		return(0);
 		}
 

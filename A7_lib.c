@@ -22,6 +22,9 @@
 #define true 1
 #define false 0
 
+
+extern struct gpsStruct gps;
+
 int A7_GPSPowerON = false;
 int A7_httpInitialize = false;
 int A7_dataConnected = false;
@@ -148,7 +151,7 @@ restart:
 	RS232_cputs(A7_commond_cport_nr, gsm_power_soft_reset);
 	Resetbufer(A7_buf,sizeof(A7_buf));
 	ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
-	sleep(45);
+	sleep(35);
 
 
 retry2:
@@ -200,7 +203,7 @@ int resetHardA7GPSModule(int n) {
 			ReadComport(A7_commond_cport_nr,A7_buf,6000,5000000);
 			//if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
 				//goto exit;
-			sleep(40);
+			sleep(30);
 			GPSA7NIMEAData(1);
 			sleep(1);
 
@@ -459,7 +462,7 @@ int A7DataConnect() {
 			goto exit;
 	
 		RS232_cputs(A7_commond_cport_nr, data_connect_string4);
-		sleep(5);
+		sleep(4);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
@@ -467,7 +470,7 @@ int A7DataConnect() {
 
 	
 		RS232_cputs(A7_commond_cport_nr, data_connect_string5);
-		sleep(10);
+		sleep(8);
 		Resetbufer(A7_buf,sizeof(A7_buf));
 		ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 		if(MapForward(A7_buf,A7_buf_SIZE,(unsigned char*)A7_OKToken,2) == NULL)
@@ -647,16 +650,31 @@ int sendA7StatusToTCPServer(int testData)
 	Resetbufer(send_string,1024);	
 	strcpy(A7_device_id_str,"1234567890");
 	if(testData)
+	{
+	//test data should be comment after real data
+	A7_longitude_str=dtostrf(88.8888888,0,6,t_buffer11);
+	A7_latitude_str=dtostrf(88.8888888,0,6,t_buffer22);
+	strncpy(A7_updated_date_str,"310117",6);
+	strncpy(A7_updated_time_str,"101010",6);
+	A7_updated_time_str[7]= 0;
+	A7_updated_date_str[7] =0 ;
+	}
+
+	if(gps.flagDataReady)
 		{
 		//test data should be comment after real data
-		A7_longitude_str=dtostrf(88.8888888,0,6,t_buffer11);
-		A7_latitude_str=dtostrf(88.8888888,0,6,t_buffer22);
-		strncpy(A7_updated_date_str,"310117",6);
-		strncpy(A7_updated_time_str,"101010",6);
-		A7_updated_time_str[7]= 0;
+		A7_longitude_str=dtostrf(gps.longitude,0,6,t_buffer11);
+		A7_latitude_str=dtostrf(gps.latitude,0,6,t_buffer22);
+		strncpy(A7_updated_time_str,gps.words[1],6);
 		A7_updated_date_str[7] =0 ;
 		}
 	
+	if(gps.flagDateReady)
+		{
+		strncpy(A7_updated_date_str,gps.words[9],6);
+		A7_updated_date_str[7] =0 ;
+		}
+
 
 				Resetbufer(send_string,1024);
 	
@@ -677,9 +695,9 @@ int sendA7StatusToTCPServer(int testData)
 				  //  goto exit;
 	
 	
-				RS232_cputs(A7_commond_cport_nr, tcp_string3);
-				Resetbufer(A7_buf,sizeof(A7_buf));
-				ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
+				//RS232_cputs(A7_commond_cport_nr, tcp_string3);
+				//Resetbufer(A7_buf,sizeof(A7_buf));
+				//ReadComport(A7_commond_cport_nr,A7_buf,6000,500000);
 				// Check if "OK" string is present in the received data 
 				//if(MapForward(A7_buf,A7_OKToken,(unsigned char*)A7_OKToken,2) == NULL)
 				  //  goto exit;

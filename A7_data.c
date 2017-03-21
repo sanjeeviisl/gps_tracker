@@ -38,53 +38,7 @@ void parseDataA7GPS(void);
 void parseA7GPSNIMEADATA(char c);
 void parseNimeaData(unsigned char * string, int size);
 
-
-typedef int bool ;
-
-int A7_count =0;
-char * A7_latitude_str;
-char * A7_longitude_str;
-char A7_updated_time_str[7];
-char A7_updated_date_str[9];
-char t_buffer111[10];
-char t_buffer222[10];
-
-
-struct gpsStruct {//GPRMC
-    int     timeZone;
-    bool    flagRead;        // flag used by the parser, when a valid sentence has begun
-    bool    flagDataReady;   // valid GPS fix and data available, user can call reader functions
-    char    words[20][15];  // hold parsed words for one given NMEA sentence
-    char    szChecksum[15];	// hold the received checksum for one given NMEA sentence
-
-    // will be set to true for characters between $ and * only
-    bool    flagComputedCks;     // used to compute checksum and indicate valid checksum interval (between $ and * in a given sentence)
-    int     checksum;            // numeric checksum, computed for a given sentence
-    bool    flagReceivedCks;     // after getting  * we start cuttings the received checksum
-    int     index_received_checksum;// used to parse received checksum
-
-    // word cutting variables
-    int     wordIdx;         // the current word in a sentence
-    int     prevIdx;		// last character index where we did a cut
-    int     nowIdx ;		// current character index
-
-    // globals to store parser results
-    bool    positionFixIndicator;   //GPGGA
-    bool    dataValid;              //GPRMC
-    float   longitude;     // GPRMC and GPGGA
-    float   latitude;	// GPRMC and GPGGA
-    unsigned char   UTCHour, UTCMin, UTCSec,		// GPRMC and GPGGA
-                                    UTCDay, UTCMonth, UTCYear;	// GPRMC
-    int     satellitesUsed;// GPGGA
-    float   dilution;      //GPGGA
-    float   altitude;	// GPGGA
-    float   speed;		// GPRMC
-    float   bearing;	// GPRMC
-
-
-};
-
-static struct gpsStruct gps;
+struct gpsStruct gps;
 char * temp;
 char t_buffer[10];
 char t_buffer1[10];
@@ -95,8 +49,11 @@ char t_buffer5[10];
 
 int n,write_position,readComplete;
 unsigned char gps_data_buffer[22400];
-int no_data_found;
 
+
+
+int charToInt(char c){ return (c - 48);}
+double trunc(double d){ return (d>0) ? floor(d) : ceil(d) ; }
 
 int receiveA7GPSData() {
 int count = 0 ;
@@ -105,8 +62,6 @@ unsigned char buff;
 n = 0;
 write_position = 0;
 readComplete = true;
-no_data_found =true;
-
 
 while (true) { 
 	  n = RS232_PollComport(A7_data_cport_nr,&buff,1 );
@@ -119,7 +74,6 @@ while (true) {
 	  
 	  if(count > 120) {	  
 	  		gps_data_buffer[write_position] = 0;   
-			//resetAllData();
 			parseNimeaData(gps_data_buffer, write_position);
 			
 	  	}
@@ -133,74 +87,19 @@ while (true) {
 }
 
 
-void resetAllData(){
-	write_position = 0;
-	Resetbufer(gps_data_buffer,10250);
-	A7_longitude_str=dtostrf(88.8888888,0,6,t_buffer111);
-	A7_latitude_str=dtostrf(88.8888888,0,6,t_buffer222);
-	strncpy(A7_updated_date_str,"310117",6);
-	strncpy(A7_updated_time_str,"101010",6);
-	A7_updated_time_str[7]= 0;
-	A7_updated_date_str[7] =0 ;
-
-
-}
-	
-
-unsigned char * get_A7_longitude_str(){
-	if(no_data_found)
-		return "no_Data";
-	else
-		return A7_longitude_str;
-		
-}
-
-unsigned char * get_A7_latitude_str(){
-	if(no_data_found)
-		return "no_Data";
-	else
-		return A7_latitude_str;
-		
-}
-
-
-unsigned char * get_A7_updated_date_str(){
-	if(no_data_found)
-		{
-		return "no_Data";
-		}
-	return A7_updated_date_str;
-		
-}
-
-unsigned char * get_A7_updated_time_str(){
-	if(no_data_found)
-		{
-		return "no_Data";
-		}
-	return A7_updated_time_str;
-		
-}
-
 int getDataStatus()
 {
-	return no_data_found;
+	return gps.flagDataReady;
 }
 
 void parseNimeaData(unsigned char * string, int size) {
 	int i;
 	char ch;
-	no_data_found =true;
 	for(i= 0 ; i < size ;i++)
-	  {
+	{
 		  ch = string[i];
 		  parseA7GPSNIMEADATA(ch);
-		  if(A7_count>0)
-			{
-			 no_data_found = false;
-			 A7_count =0;
-			}
-		}
+	}
 }
 
 
@@ -297,13 +196,13 @@ void parseDataA7GPS(void){
         gps.longitude = degrees + minutes / 60.0f;
 
 
-        A7_longitude_str=dtostrf(gps.longitude,0,6,t_buffer1);
-        A7_latitude_str=dtostrf(gps.latitude,0,6,t_buffer2);
+//        A7_longitude_str=dtostrf(gps.longitude,0,6,t_buffer1);
+//        A7_latitude_str=dtostrf(gps.latitude,0,6,t_buffer2);
 
 
-		strncpy(A7_updated_time_str,gps.words[1],6);
+//		strncpy(A7_updated_time_str,gps.words[1],6);
 		
-		A7_updated_time_str[7]= 0;
+//		A7_updated_time_str[7]= 0;
 
         // parse number of satellites
         gps.satellitesUsed = (int)strtof(gps.words[7], NULL);
@@ -314,11 +213,11 @@ void parseDataA7GPS(void){
         // parse altitude
         gps.altitude = strtof(gps.words[9], NULL);
 
-     //   printf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
-     //   printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
+        //printf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
+        //printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
        // sleep(1); 
         // data ready
-        A7_count++;
+//        A7_count++;
         gps.flagDataReady = true;
     }//$GPGGA
 
@@ -350,7 +249,7 @@ void parseDataA7GPS(void){
             // clear data
 //            gps.res_fLatitude = 0;
 //            gps.res_fLongitude = 0;
-            gps.flagDataReady = false;
+            gps.flagDateReady = false;
     //        printf("\nNo Valid signal");
             return;
         }
@@ -361,19 +260,19 @@ void parseDataA7GPS(void){
         // parse bearing
         gps.bearing = strtof(gps.words[8], NULL);
 
-		strncpy(A7_updated_date_str,gps.words[9],6);
-		A7_updated_date_str[7]=0;
+//		strncpy(A7_updated_date_str,gps.words[9],6);
+//		A7_updated_date_str[7]=0;
 		
         // parse UTC date
         gps.UTCDay = charToInt(gps.words[9][0]) * 10 + charToInt(gps.words[9][1]);
         gps.UTCMonth = charToInt(gps.words[9][2]) * 10 + charToInt(gps.words[9][3]);
         gps.UTCYear = charToInt(gps.words[9][4]) * 10 + charToInt(gps.words[9][5]);
 		
-       // printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
-      ///  printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);
+        //printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
+        //printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);
         //sleep(1); 
         // data ready
-        gps.flagDataReady = true;
+        gps.flagDateReady = true;
     }//$GPRMC
     return;
 }//parseDataSIM808GPS

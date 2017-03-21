@@ -15,6 +15,10 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <sys/types.h>
+#include <errno.h>
 #include <unistd.h>
 #include <gpio_lib.h>
 #include "A7_lib.h"
@@ -24,6 +28,10 @@
 
 
 extern struct gpsStruct gps;
+extern pthread_mutex_t lock;
+extern sem_t done_filling_list;
+extern sem_t filling_list;
+
 
 int A7_GPSPowerON = false;
 int A7_httpInitialize = false;
@@ -660,6 +668,8 @@ int sendA7StatusToTCPServer(int testData)
 	A7_updated_date_str[7] =0 ;
 	}
 
+	pthread_mutex_lock(&lock);
+
 	if(gps.flagDataReady)
 		{
 		//test data should be comment after real data
@@ -675,6 +685,8 @@ int sendA7StatusToTCPServer(int testData)
 		A7_updated_date_str[7] =0 ;
 		}
 
+	pthread_mutex_unlock(&lock);
+		
 
 				Resetbufer(send_string,1024);
 	

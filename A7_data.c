@@ -95,11 +95,13 @@ int getDataStatus()
 void parseNimeaData(unsigned char * string, int size) {
 	int i;
 	char ch;
+	pthread_mutex_lock(&lock);
 	for(i= 0 ; i < size ;i++)
 	{
 		  ch = string[i];
 		  parseA7GPSNIMEADATA(ch);
 	}
+	pthread_mutex_unlock(&lock);
 }
 
 

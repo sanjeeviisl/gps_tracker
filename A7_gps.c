@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <sys/types.h>
+#include <errno.h>
 #include <unistd.h>
 #include "A7_lib.h"
 #include "rs232.h"
@@ -19,6 +23,9 @@
 
 int send_count = 0;
 int data_found;
+extern pthread_mutex_t lock;
+extern sem_t done_filling_list;
+extern sem_t filling_list;
 
 
 int sendA7GPSData() {

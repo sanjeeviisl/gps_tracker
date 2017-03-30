@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <sys/types.h>
+#include <errno.h>
 #include <unistd.h>
 #include "A7_lib.h"
 #include "rs232.h"
@@ -18,6 +22,7 @@
 #define false 0
 
 int send_count = 0;
+<<<<<<< HEAD
 int sent = false;
 
 static int  charToInt(char c);
@@ -208,41 +213,15 @@ void parseDataA7GPS(void){
         A7_count++;
         gps.flagDataReady = true;
     }//$GPGGA
+=======
+int data_found;
+extern pthread_mutex_t lock;
+extern sem_t done_filling_list;
+extern sem_t filling_list;
+>>>>>>> 5a07b59be794440e2665fb998bff1d3b09fe6186
 
-    /* $GPRMC
-     * note: a siRF chipset will not support magnetic headers.
-     * $GPRMC,hhmmss.ss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,ddmmyy,x.x,a*hh
-     * ex: $GPRMC,230558.501,A,4543.8901,N,02112.7219,E,1.50,181.47,230213,,,A*66,
-     *
-     * WORDS:
-     *  0    = $GPRMC - Recommended Minimum Specific GNSS Data
-     *  1    = UTC of position fix
-     *  2    = Data status (V=navigation receiver warning)
-     *  3    = Latitude of fix
-     *  4    = N or S
-     *  5    = Longitude of fix
-     *  6    = E or W
-     *  7    = Speed over ground in knots
-     *  8    = Track made good in degrees True, Bearing This indicates the direction that the device is currently moving in,
-     *       from 0 to 360, measured in “azimuth”.
-     *  9    = UT date
-     *  10   = Magnetic variation degrees (Easterly var. subtracts from true course)
-     *  11   = E or W
-     *  12   = Checksum
-     */
-    if (strcmp(gps.words[0], "$GPRMC") == 0) {
-        // Check data status: A-ok, V-invalid
-        if (gps.words[2][0] == 'V') {
-            gps.dataValid = false;
-            // clear data
-//            gps.res_fLatitude = 0;
-//            gps.res_fLongitude = 0;
-            gps.flagDataReady = false;
-    //        printf("\nNo Valid signal");
-            return;
-        }
-        gps.dataValid = true;
 
+<<<<<<< HEAD
         gps.speed = strtof(gps.words[7], NULL);
         gps.speed *= 1.15078; // convert to mph
         // parse bearing
@@ -363,80 +342,35 @@ free(buffer);
 //snprintf(move_file_name,sizeof(move_file_name),"%s%s%s", "rm ", " ",A7_logFileName);
 system(move_file_name);
 }
-
-static void release_buffer (char* buffer)
-{
-Resetbufer(buffer,write_position);
-write_position = 0;
-
-}
-
-
+=======
 int sendA7GPSData() {
-int i; 
-size_t size;
-char ch;
-unsigned char *string;
-int no_data_found;
+>>>>>>> 5a07b59be794440e2665fb998bff1d3b09fe6186
 
-no_data_found =true;
-size = 0;
-sent = false;
+
+data_found =getDataStatus();
+
+send_count++;
 
 
 if(A7DataConnect())
 	{
 	printf("sending data to web server from buffer\n");
-	string = read_from_buffer(&size); //check data
-    if( size > 0) 
-        for(i= 0 ; i < size ;i++)
-          {
-          ch = string[i];
-          parseA7GPSNIMEADATA(ch);
-          if(A7_count>0)
-            {
-	         no_data_found = false;
-             A7_count =0;
-			 send_count++;
-            }
-          }
-	if(no_data_found)
-		{
-		printf("\n No Data Found sending Status to web server from buffer\n");
-		if(sendA7StatusToTCPServer(1)){
-			 	printf("send status Ok!\n");
-				resetHardA7GPSModule(1);
-				goto SUCCESS;
-			 	}
-		
-		else
-		   {
-		   printf("send status NOT Ok!\n");
-		   goto exit;
-		   }
-		}
+	//
+	if(data_found)
+		sendA7StatusToTCPServer(1);
 
-	release_buffer(string);	
-	if(send_count > 20)
-		{
-		A7DataDisconnect();
-		sleep(1);
-		A7DataConnect();
-		send_count = 0;
-		}
-	}		
-else
-	{
- 	goto exit;
+	A7DataDisconnect();
+	
+	SUCCESS: printf("sendGPSData SUCCESS \n");
+	
+	return(1);
 	}
 
-
-SUCCESS: printf("sendGPSData SUCCESS \n");
-		send_count++;
-
-return(1);
-exit: printf("\n sendGPSData FAILED\ n");
-return(0);
+	else
+		{
+		exit: printf("\n sendGPSData FAILED\ n");
+		return(0);
+		}
 
 }
 

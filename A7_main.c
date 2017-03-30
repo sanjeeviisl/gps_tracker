@@ -30,11 +30,17 @@ void* gpsA7DataReceiverTask(void *arg)
     unsigned long i = 0;
     pthread_t id = pthread_self();
 
+	
+	GPSA7Power(1);
+	GPSA7NIMEAData(1);
+	
+	//pthread_mutex_unlock(&lock);
+	//sem_post(&done_filling_list);
+
     while(1)
     {
-    sem_wait(&filling_list); // blocks is semaphore 0. If semaphore nonzero,
-
-    pthread_mutex_lock(&lock);  
+    //sem_wait(&filling_list); // blocks is semaphore 0. If semaphore nonzero,
+    //pthread_mutex_lock(&lock);  
     if(pthread_equal(id,tid[0]))
     {
 	//	 printf("\n Receiver  thread processing\n");
@@ -51,8 +57,6 @@ void* gpsA7DataReceiverTask(void *arg)
 	         
     }
 
-    pthread_mutex_unlock(&lock);
-    sem_post(&done_filling_list);
 
     }
 
@@ -64,11 +68,12 @@ void* gpsA7DataSenderTask(void *arg)
     unsigned long i = 0;
     pthread_t id = pthread_self();
 
+    //sem_wait(&done_filling_list);    
+
+    //pthread_mutex_lock(&lock);  
+
     while(1)
     {
-
-    sem_wait(&done_filling_list);    
-    pthread_mutex_lock(&lock);  
 	
     if(pthread_equal(id,tid[1]))
     {
@@ -82,8 +87,8 @@ void* gpsA7DataSenderTask(void *arg)
   	   		}
     }
         
-    pthread_mutex_unlock(&lock);
-    sem_post(&filling_list);
+ //   pthread_mutex_unlock(&lock);
+ //   sem_post(&filling_list);
      
     }
 
@@ -93,7 +98,7 @@ int A7_main()
 {
     int i,s = 0;
     int err,res;
-    sleep(10);
+    //sleep(10);
     if(!openA7Port())
 	{
          printf("\n Comport is not initialized\n");
@@ -112,6 +117,9 @@ int A7_main()
 	A7_GPSPowerON = 0;
 	A7_httpInitialize = 0;
 	A7_dataConnected = 0;
+	GPSA7Power(0);
+	GPSA7NIMEAData(0);
+	
 
     res = sem_init(&done_filling_list,  /* pointer to semaphore */
                        0 ,              /* 0 if shared between threads, 1 if shared between processes */

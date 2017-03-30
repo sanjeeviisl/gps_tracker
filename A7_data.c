@@ -64,7 +64,7 @@ while (true) {
   if (n == 0) {sleep(1); continue;}
   
   if(buff == '$') count++;
-  if(count > 300) break;
+  if(count > 60) break;
   gps_data_buffer[write_position++] = buff;
   //printf("%c", buff);
 }

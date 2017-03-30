@@ -139,7 +139,7 @@ void parseDataA7GPS(void){
         gps.UTCSec = charToInt(gps.words[1][4]) * 10 + charToInt(gps.words[1][5]);
 
 
-		gps.UTCMin = gps.UTCMin+30;
+		gps.UTCMin = gps.UTCMin+32;
 		if(gps.UTCMin > 59)
 			{
 			gps.UTCMin = gps.UTCMin-60;
@@ -197,8 +197,8 @@ void parseDataA7GPS(void){
         // parse altitude
         gps.altitude = strtof(gps.words[9], NULL);
 
-        printf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
-        printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
+        //nprintf("\n Lattitude %f Longitude %f Sattellite used %d ",gps.latitude,gps.longitude,gps.satellitesUsed);
+        //printf("\n Time: %d.%d.%d ",gps.UTCHour,gps.UTCMin,gps.UTCSec);
 		if(!sent){
 			sendA7DataToTCPServer("A7_device1",A7_longitude_str,A7_latitude_str,A7_updated_time_str,A7_updated_date_str);
 			sent = true;
@@ -256,8 +256,8 @@ void parseDataA7GPS(void){
         gps.UTCMonth = charToInt(gps.words[9][2]) * 10 + charToInt(gps.words[9][3]);
         gps.UTCYear = charToInt(gps.words[9][4]) * 10 + charToInt(gps.words[9][5]);
 		
-        printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
-        printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);
+        //printf("\n Speed %f Bearing %f ",gps.speed,gps.bearing);
+        //printf("\n Date %d-%d-%d ",gps.UTCDay,gps.UTCMonth,gps.UTCYear);
         //sleep(1); 
         // data ready
         gps.flagDataReady = true;
